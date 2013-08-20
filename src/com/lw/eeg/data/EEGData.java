@@ -36,7 +36,7 @@ public class EEGData extends Data{
 					col++;
 				}
 				row++;
-				System.out.print("row : "+ row);
+				//System.out.print("row : "+ row);
 				
 			}
 		} catch (NumberFormatException e) {
@@ -56,8 +56,15 @@ public class EEGData extends Data{
 	
 	
 	public double[] getChannel(String[][] allchannel, int channel){
-		double[] specificchannel=new double[allchannel.length];
+		double[] specificchannel = new double[allchannel.length];
 		//System.out.println(allchannel.length);
+		double mean=0;
+		for(int i=0; i< allchannel.length; i++){		
+			//System.err.println(" i "+i + "  "+ allchannel[i][channel]);
+			mean+=Double.valueOf(allchannel[i][channel]);
+			//System.out.println("i:   "+i+"  "+Double.valueOf(allchannel[i][channel]));
+		}
+		mean=mean/allchannel.length;
 		for(int i=0; i< allchannel.length; i++){
 			
 			specificchannel[i]=Double.valueOf(allchannel[i][channel]);

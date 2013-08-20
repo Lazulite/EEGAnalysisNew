@@ -40,6 +40,14 @@ public class Data {
 		return adjData;		
 	}
 	
+	public double[] getSegment(double[] data, int index, int size){
+		double[] segment=new double[size];
+		for(int i=0; i<size; i++){
+			segment[i]=data[index+i];
+		}
+		return segment;
+	}
+	
 	public String[][] getTotolData(String[][] eeg, String[][] hb, String[][] sensor){
 		/*for(int i=0; i < eeg.length; i++){
 			System.out.print("\n row "+i + ":   ");

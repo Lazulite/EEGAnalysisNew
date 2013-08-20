@@ -42,7 +42,7 @@ public class XYSeriesPlot extends ApplicationFrame {
     private XYSeriesCollection createSeries(){
     	XYSeriesCollection collection = new XYSeriesCollection();
     	
-    	for(int j=0; j<4;j++){
+    	for(int j=0; j<5;j++){
     		XYSeries series1 = new XYSeries("Series"+j);
             for(int i=0; i<data.length;i++){
             	series1.add(Double.valueOf(data[i][5]),Double.valueOf(data[i][j]));

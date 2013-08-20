@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="E:/dvlPackage/jar/jtransforms-2.4.jar"/>
 	<classpathentry kind="lib" path="E:/dvlPackage/jar/jfreechart/jcommon-1.0.18.jar"/>
 	<classpathentry kind="lib" path="E:/dvlPackage/jar/jfreechart/jfreechart-1.0.15.jar"/>
+	<classpathentry kind="lib" path="E:/dvlPackage/jar/weka.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

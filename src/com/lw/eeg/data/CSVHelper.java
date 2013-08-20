@@ -35,7 +35,7 @@ public class CSVHelper {
 	public FileWriter createFile_emoState(){	
 		try {
 			fileWriter = new FileWriter("C:\\Users\\Leslie\\Desktop\\EEGdata\\WithEmotivAPI\\"+fileName);
-			fileWriter.write("ExcitementShortTermScore,ExcitementShortTermScore,EngagementBoredomScore,FrustrationScore,MeditationScore,ES_Timestamp,Timestamp\n"); 
+			fileWriter.write("ExcitementLongTerm,ExcitementShortTerm,Engagement/Boredom,Frustration,Meditation,ES_Timestamp,Timestamp\n"); 
 			return fileWriter;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -84,7 +84,7 @@ public class CSVHelper {
 	        //System.out.println("count"+size[0]+"=="+size[1]);
 	        size[1]=size[1]/size[0]+1;
 	        //System.out.println("====count"+size[0]+"=="+size[1]);
-	        //size[0]--;
+	        size[0]--;
 	        return size;
 	    } finally {
 	        is.close();
