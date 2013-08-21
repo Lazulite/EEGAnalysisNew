@@ -56,6 +56,9 @@ public class EEGAnalysis {
 //		emodata=emoData.readData(emoData.init());
 //		String[][] adjemodata=emoData.adjustData(emodata, 128, 128);
 		//dataHelper.getTotolData(eegdata, null, null);
+		
+		
+		
 		double[][] totalFeature = new double[14][4];
 		for(int ch=1; ch<15; ch++){
 			
