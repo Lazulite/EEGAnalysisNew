@@ -20,15 +20,17 @@ public class ARFFWraper {
     private List	  classVal;
     private Instances       data;
     private double[]        vals;
+    private double[][]	paras;
     
-    
-    public ARFFWraper(){
-    	
+    public ARFFWraper(double[][] _paras){
+    	paras=_paras;
     }
     
     public Instances getInstances(){
     	return data;
     }
+    
+    
     public void create() throws Exception{
     	// 1. set up attributes
 	    atts = new ArrayList();

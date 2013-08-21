@@ -3,6 +3,9 @@ package com.lw.eeg.processing;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.functions.*;
+import weka.classifiers.pmml.consumer.SupportVectorMachineModel;
+import weka.classifiers.trees.*;
 import weka.core.Instances;
 import com.lw.eeg.processing.*;
 
@@ -16,11 +19,17 @@ public class WekaClassifier {
 	}
 	
 	public Classifier createClassifier(String classifier) throws Exception{
+		
 		Classifier cModel = null;
 		if(classifier=="NaiveBayes"){
         
-        cModel=(Classifier) new NaiveBayes();
-        cModel.buildClassifier(mInstances);
+	        cModel=(Classifier) new NaiveBayes();
+	        cModel.buildClassifier(mInstances);
+		}
+		
+		if(classifier=="TreeJ48"){
+			cModel=(Classifier) new J48();
+	        cModel.buildClassifier(mInstances);
 		}
         return cModel;
         

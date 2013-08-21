@@ -56,9 +56,8 @@ public class EEGAnalysis {
 //		emodata=emoData.readData(emoData.init());
 //		String[][] adjemodata=emoData.adjustData(emodata, 128, 128);
 		//dataHelper.getTotolData(eegdata, null, null);
-		
-		
-		
+
+		//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
 		double[][] totalFeature = new double[14][4];
 		for(int ch=1; ch<15; ch++){
 			
@@ -113,6 +112,51 @@ public class EEGAnalysis {
 			System.out.println("row "+ row + " : " );
 		}
 		
+		
+		double para1 = 0.0000;
+		double low = 0.0000;
+		double high = 0.0000;
+		double ratio = 0.0000;
+		
+		double afRatio=0.0000;
+		double fRatio=0.0000;
+		double fcRatio=0.0000;
+		
+		for(int row=0; row<totalFeature.length;row++){
+			for(int col=0;col<totalFeature[0].length;col++){
+				if(row == 0){
+					low = totalFeature[row][0]+totalFeature[row][1];
+					high = totalFeature[row][2]+totalFeature[row][3];
+					
+				}
+				if(row == 2){
+					low += totalFeature[row][0]+totalFeature[row][1];
+					high += totalFeature[row][2]+totalFeature[row][3];
+				}
+				if(row == 3){
+					low += totalFeature[row][0]+totalFeature[row][1];
+					high += totalFeature[row][2]+totalFeature[row][3];
+				}
+				if(row == 13){
+					low += totalFeature[row][0]+totalFeature[row][1];
+					high += totalFeature[row][2]+totalFeature[row][3];
+				}
+				if(row == 11){
+					low += totalFeature[row][0]+totalFeature[row][1];
+					high += totalFeature[row][2]+totalFeature[row][3];
+				}
+				if(row == 10){
+					low += totalFeature[row][0]+totalFeature[row][1];
+					high += totalFeature[row][2]+totalFeature[row][3];
+				}
+				
+				ratio= low/ high;
+				afRatio=totalFeature[0][3]/totalFeature[13][3];
+				fRatio=totalFeature[2][3]/totalFeature[11][3];
+				fcRatio=totalFeature[3][3]/totalFeature[10][3];
+			}
+			System.out.println("row "+ row + " : " );
+		}
 		
 		ARFFWraper simpleARFF = new ARFFWraper();
 		simpleARFF.create();
