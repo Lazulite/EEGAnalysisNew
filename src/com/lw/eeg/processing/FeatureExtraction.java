@@ -43,7 +43,7 @@ public class FeatureExtraction {
 
 
 		double[] spectrum = new double[fftData.length];
-		System.out.println(fftData.length+"  =>fs"+String.valueOf(size/2-1));
+		//System.out.println(fftData.length+"  =>fs"+String.valueOf(size/2-1));
 		for (int k= 0; k<size/2; k++)
 		{
 			spectrum[k] = 10*Math.log10(Math.sqrt(fftData[2*k]*fftData[2*k]  + fftData[2*k+1]*fftData[2*k+1]));
@@ -54,11 +54,11 @@ public class FeatureExtraction {
 		
 		afterfft=new double[size/2];
 		System.arraycopy(spectrum, 0, afterfft, 0, size/2);
-		System.out.println(" fs"+ size +" data.length" + data.length);
+		//System.out.println(" fs"+ size +" data.length" + data.length);
 		
 	}
 	
-	public void calcFeature(){
+	public void calcEEGFeature(){
 		
 		double res=fs/size; 
 		feature=new double[5];
@@ -88,11 +88,18 @@ public class FeatureExtraction {
 		feature[1]=feature[0]/theta;
 		feature[2]=feature[0]/alpha;
 		feature[3]=feature[0]/beta;
-		for(double d:feature)
-			System.out.println(d);
+//		for(double d:feature)
+//			System.out.println(d);
 		//return null;
 		
 	}
+	
+	public double[][] sumEEGFeatures(){
+
+		return null;
+	}
+	
+	
 			
 	public double[] getFFTresult(){
 		return afterfft;

@@ -5,16 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.swing.RowFilter;
+
 import org.jfree.ui.RefineryUtilities;
 import org.omg.CORBA.PRIVATE_MEMBER;
 import org.omg.PortableServer.ImplicitActivationPolicy;
+
+import weka.core.Instances;
 
 
 import com.lw.eeg.EEGLog.*;
 import com.lw.eeg.data.*;
 import com.lw.eeg.plot.*;
 import com.lw.eeg.processing.*;
-import com.lw.eeg.processing.WindowFunction;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
@@ -42,7 +45,7 @@ public class EEGAnalysis {
 		eegdata=eegData.init();
 	
 		eegdata=eegData.readData(eegData.init());
-		String[][] adjeegdata=eegData.adjustData(eegdata, 0, eegdata.length-256);
+		String[][] adjeegdata=eegData.adjustData(eegdata, 0,0);
 		//System.out.println(eegdata.length+ "  " +eegdata[0].length+"   "+ eegdata[0][0]);
 		
 		
@@ -74,7 +77,7 @@ public class EEGAnalysis {
 				feature.applyWindowFunc("HANNING");
 				feature.applyFFT();
 		        //double[] fftresult= feature.getFFTresult();
-		        feature.calcFeature();
+		        feature.calcEEGFeature();
 		        double[] features=feature.getFeature();
  
 		        for(int f=0; f<4;f++){
@@ -93,14 +96,27 @@ public class EEGAnalysis {
 			
 			for(int t=0; t<4; t++){
 				System.err.println("ch=======" + ch);
+				System.out.println("featuresum : " + featuressum[t]);
 				totalFeature[ch-1][t]=featuressum[t];
 				
 			}
 			
-			for(double d:featuressum){
-				System.out.println("featuresum: "+ d);
-			}
 		}
+		
+		for(int row=0; row<totalFeature.length;row++){
+			for(int col=0;col<totalFeature[0].length;col++){
+				System.out.print(totalFeature[row][col]+" ");
+			}
+			System.out.println("row "+ row + " : " );
+		}
+		
+		
+		ARFFWraper simpleARFF = new ARFFWraper();
+		simpleARFF.create();
+		Instances mInstances = simpleARFF.getInstances(); 
+		mInstances.setClassIndex(mInstances.numAttributes()-1);
+		WekaClassifier mWeka = new WekaClassifier(mInstances);
+		mWeka.createClassifier("NaiveBayes");
 		
 //		String[][] adjeegdata=eegData.adjustData(eegdata, 0, 128);
 //		//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,
@@ -114,7 +130,7 @@ public class EEGAnalysis {
 //        feature.calcFeature();
         
 		
-		
+		//Plot module
 //
 //		CombinedXYPlot chart1= new CombinedXYPlot("EEG Raw Data",adjeegdata);
 //        chart1.pack();
