@@ -16,15 +16,24 @@ import weka.core.Instances;
  */
 public class ARFFWraper {
 
-	private List      atts;
-    private List	  classVal;
-    private Instances       data;
-    private double[]        vals;
+    private Instances   data;
+    private Instances 	tdata;
     private double[][]	paras;
+    private double[] test= new double[4];
+    
     
     public ARFFWraper(double[][] _paras){
+    	//copy
     	paras=_paras;
     }
+
+    public ARFFWraper(double[] _test){
+    	System.arraycopy(_test, 0, test, 0, _test.length);
+    	for(double d:test){
+    		System.err.println(d);
+    	}
+    }
+    
     
     public Instances getInstances(){
     	return data;
@@ -33,14 +42,14 @@ public class ARFFWraper {
     
     public void create() throws Exception{
     	// 1. set up attributes
-	    atts = new ArrayList();
+	    List atts = new ArrayList();
 	    
 	    atts.add(new Attribute("att1"));
 	    atts.add(new Attribute("att2"));
 	    atts.add(new Attribute("att3"));
 	    atts.add(new Attribute("att4"));
-	    classVal = new ArrayList();
-	   // classVal.add("dummy");
+	    List classVal = new ArrayList();
+	    //classVal.add("dummy");
 	    classVal.add("A");
 	    classVal.add("B");
 	    atts.add(new Attribute("att5",classVal));
@@ -52,29 +61,63 @@ public class ARFFWraper {
 	    // 3. fill with data
 	    
 	    // first instance
-	    vals = new double[data.numAttributes()];
-	    vals[0] = Math.PI;
-	    vals[1] = 3333.3;
-	    vals[2] = 551.8776;
-	    vals[3] = 6666.6;
-	    vals[4] = classVal.indexOf("A");
-	    // add
-	    data.add(new  DenseInstance(1.0, vals));
-
-	    // second instance
-	    vals = new double[data.numAttributes()];  // important: needs NEW array!
-	    vals[0] = Math.E;
-	    vals[1] = 333.3;
-	    vals[2] = 5556.99;
-	    vals[3] = 7777.7;
-	    vals[4] = classVal.indexOf("B");
-	    // add
-	    data.add(new  DenseInstance(1.0, vals));
+//	    double[] vals = new double[data.numAttributes()];;
+	    for(int row=0; row<paras.length;row++){
+	    	double[] vals = new double[data.numAttributes()];
+		    for(int col=0; col<paras[0].length;col++){
+		    	vals[col]=paras[row][col];
+		    }
+	    	//System.arraycopy(paras[row], 0, vals, 0, paras[row].length);
+		   
+	    	if(row==0)
+		    	vals[4]=classVal.indexOf("A");
+		    if(row==1)
+		    	vals[4]=classVal.indexOf("B");
+	    	
+	    	data.add(new  DenseInstance(1.0, vals)); 
+	    }
 	    
-	    
-	    // 4. output data
+	    System.out.println("before output data");
 	    System.out.println(data);
-	    DataSink.write("C:\\Users\\Leslie\\Desktop\\arffData.arff", data);
+	   // DataSink.write("C:\\Users\\Leslie\\Desktop\\arffData.arff", data);
+    }
+    
+    public void createTest() throws Exception{
+    	// 1. set up attributes
+    	
+	    List atts = new ArrayList();
+	    
+	    atts.add(new Attribute("att1"));
+	    atts.add(new Attribute("att2"));
+	    atts.add(new Attribute("att3"));
+	    atts.add(new Attribute("att4"));
+	    List classVal = new ArrayList();
+	    classVal.add("?");
+	    //classVal.add("A");
+	    atts.add(new Attribute("att5",classVal));
+	    
+	    //atts.add(new Attribute("att5", (List<String>) null));
+	    tdata = new Instances("MyFeatures", (ArrayList<Attribute>) atts, 10);
+
+    	double[] vals = new double[tdata.numAttributes()];
+//
+//    	System.err.println("Test :" + test.length);
+//
+//    	for(double d:test){
+//    		System.err.println(d);
+//    	}
+//    	System.err.println("==========");
+    	
+    	
+    	for(int col=0; col<test.length; col++){
+	    	vals[col]=test[col];
+	    	System.err.println(vals[col]);
+	    }
+    	vals[4] = classVal.indexOf("?");
+    	tdata.add(new  DenseInstance(1.0, vals));
+
+	    System.out.println(tdata);
+	    //DataSink.write("C:\\Users\\Leslie\\Desktop\\arffData.arff", data);
     }
 
 }

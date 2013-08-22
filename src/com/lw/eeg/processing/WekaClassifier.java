@@ -35,10 +35,10 @@ public class WekaClassifier {
         
 	}
 	
-	public void Evaluation(Classifier cModel) throws Exception{
+	public void Evaluation(Classifier cModel, Instances test) throws Exception{
 		
 		Evaluation eTest = new Evaluation(mInstances);
-        eTest.evaluateModel(cModel, mInstances);
+        eTest.evaluateModel(cModel, test);
          
         // Print the result ид la Weka explorer:
         String strSummary = eTest.toSummaryString();
