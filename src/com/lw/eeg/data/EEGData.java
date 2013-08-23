@@ -13,6 +13,10 @@ public class EEGData extends Data{
 		// TODO Auto-generated constructor stub
 	}
 	
+	public EEGData() {
+
+	}
+	
 	public String[][] readData(String[][] data) {
 		
 		try {

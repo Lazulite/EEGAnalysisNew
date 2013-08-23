@@ -1,11 +1,14 @@
 package com.lw.eeg.Main;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.swing.JFrame;
 import javax.swing.RowFilter;
+import javax.swing.UIManager;
 
 import org.jfree.ui.RefineryUtilities;
 import org.omg.CORBA.PRIVATE_MEMBER;
@@ -23,7 +26,7 @@ import com.lw.eeg.processing.*;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 
-public class EEGAnalysis {
+public class EEGAnalysis extends JFrame {
 	private static EEGLog eegLogger;
 	private static Data dataHelper;
 	private static EEGData eegData;
@@ -32,6 +35,27 @@ public class EEGAnalysis {
 	private static String[][] eegdata;
 	
 	public static void main(String[] args) throws Exception{
+		
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					MainView frame = new MainView();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+		
+}
+		/*
 		
 		String eegFile="C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\gaokao\\"+"20130816_175754_rawdata.csv";
 		String eegFile2="C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\universityTalk\\"+"20130816_181144_rawdata.csv";
@@ -45,10 +69,9 @@ public class EEGAnalysis {
 		
 		
 		eegLogger = new EEGLog();
-		eegData = new EEGData(eegFile);
 		
+		eegData = new EEGData(eegFile);
 		eegdata=eegData.init();
-	
 		eegdata=eegData.readData(eegData.init());
 		String[][] adjeegdata=eegData.adjustData(eegdata, 0,0);
 		//System.out.println(eegdata.length+ "  " +eegdata[0].length+"   "+ eegdata[0][0]);
@@ -281,6 +304,6 @@ public class EEGAnalysis {
 		
 		
 }
-
+*/
 
 

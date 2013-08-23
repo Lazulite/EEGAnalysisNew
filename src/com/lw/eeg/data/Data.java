@@ -14,7 +14,9 @@ public class Data {
 	public Data(String _filepath){
 		filepath=_filepath;
 	}
-	
+	public Data(){
+
+	}
 	public String[][] init()throws Exception{
 		csvHelper.setFilename(filepath);
 		size=csvHelper.count();

@@ -20,6 +20,7 @@ public class FeatureExtraction {
 		beforewindow=new double[data.length];
 		System.arraycopy(data, 0, beforewindow, 0, data.length);
 	}
+	
 
 	public void applyWindowFunc(String window ){
 		WindowFunction w=new WindowFunction();
