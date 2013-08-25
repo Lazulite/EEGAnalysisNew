@@ -151,13 +151,24 @@ public class MainView extends JFrame {
 							allChannelPanel.add(p, BorderLayout.CENTER);
 							p.validate();
 							
+							//System.err.println("Before fCals");
 							FeaturesCalc fCalc = new FeaturesCalc(adjeegdata);
-							BarChart3DPlot featurePlot = new BarChart3DPlot(fCalc.getTotalFeature());
+							fCalc.calc(adjeegdata);
+							double[][] avgFeatureAF3 = fCalc.getAvgFeatures();
+							double[] featurebuffer = new double[4];
+							//System.err.println(avgFeatureAF3[0][0] +" length :"+ avgFeatureAF3.length);
+							
+							//System.err.println("After fCals, before plot");
+							BarChart3DPlot featurePlot = new BarChart3DPlot();
 							ChartPanel p2 = new ChartPanel(featurePlot.getChart());
-							//p2.setBounds(featurePanel.getX(), featurePanel.getY(), featurePanel.getWidth(), featurePanel.getHeight());
 							featurePanel.add(p2, BorderLayout.CENTER);
 							p2.validate();
 							
+							for(int f=0; f<avgFeatureAF3.length; f++){
+								//featurePanel.removeAll();
+								System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
+								featurePlot.updateDataset(featurebuffer);
+							}
 							
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
