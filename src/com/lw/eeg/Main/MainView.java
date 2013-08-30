@@ -32,7 +32,8 @@ public class MainView extends JFrame {
 	private static JPanel featurePanel; // Feature Panel
 	private static JPanel fftPanel; // FFT panel
 	//private static FeaturesCalc fCalc;
-	
+	private String[][] adjeegdata;
+	private ChannelButtons channelButtons;
 	
 	public MainView() throws Exception {
 		setPanel();
@@ -71,6 +72,7 @@ public class MainView extends JFrame {
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
 			}
 		});
 		mnFile.add(mntmExit);
@@ -144,12 +146,12 @@ public class MainView extends JFrame {
 						try {
 							eegRawData = eegData.init();
 							eegRawData=eegData.readData(eegData.init());
-							String[][] adjeegdata=eegData.adjustData(eegRawData, 128*5,128*5);
+							adjeegdata=eegData.adjustData(eegRawData, 128*5,128*5);
 							
 							AllChannelPlot allChannelPlot = new AllChannelPlot("xx", adjeegdata);
-							ChartPanel p = new ChartPanel(allChannelPlot.getChart());
-							allChannelPanel.add(p, BorderLayout.CENTER);
-							p.validate();
+							ChartPanel allChannelp = new ChartPanel(allChannelPlot.getChart());
+							allChannelPanel.add(allChannelp, BorderLayout.CENTER);
+							allChannelp.validate();
 							
 							//System.err.println("Before fCals");
 							FeaturesCalc fCalc = new FeaturesCalc(adjeegdata);
@@ -160,14 +162,23 @@ public class MainView extends JFrame {
 							
 							//System.err.println("After fCals, before plot");
 							BarChart3DPlot featurePlot = new BarChart3DPlot();
-							ChartPanel p2 = new ChartPanel(featurePlot.getChart());
-							featurePanel.add(p2, BorderLayout.CENTER);
-							p2.validate();
+							ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+							featurePanel.add(featurep, BorderLayout.CENTER);
+							featurep.validate();
 							
 							for(int f=0; f<avgFeatureAF3.length; f++){
 								//featurePanel.removeAll();
 								System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
 								featurePlot.updateDataset(featurebuffer);
+							}
+							
+							//fCalc.getFFTResult();
+							channelButtons.setEnable();
+							channelButtons.setData(adjeegdata);
+							if(channelButtons.click){
+								ChartPanel singleChannelp = new ChartPanel(channelButtons.getChart());
+								singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
+								singleChannelp.validate();
 							}
 							
 						} catch (Exception e1) {
@@ -241,7 +252,7 @@ public class MainView extends JFrame {
 		tabPanel.setLayout(null);
 		
 		allChannelPanel = new JPanel();
-		allChannelPanel.setBounds(63, 6, 1150, 531);
+		allChannelPanel.setBounds(63, 6, 1150, 478);
 		tabPanel.add(allChannelPanel);
 		allChannelPanel.setLayout(new BorderLayout(0, 0));
 		///XXXX
@@ -252,174 +263,18 @@ public class MainView extends JFrame {
 
 	
 		singleChannelPanel = new JPanel();
-		singleChannelPanel.setBounds(63, 477, 1150, 190);
+		singleChannelPanel.setBounds(63, 494, 1150, 173);
 		tabPanel.add(singleChannelPanel);
 		singleChannelPanel.setLayout(new BorderLayout(0, 0));
 		
+		channelButtons = new ChannelButtons(tabPanel);
+		/*channelButtons.setData(adjeegdata);
 		
-		JRadioButton rdbtnAF3 = new JRadioButton("AF3");
-		rdbtnAF3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnAF3.setForeground(new Color(0, 191, 255));
-		rdbtnAF3.setBounds(6, 22, 51, 23);
-		rdbtnAF3.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnAF3);
-		rdbtnAF3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
+		ChartPanel p = new ChartPanel(channelButtons.getChart());
+		singleChannelPanel.add(p, BorderLayout.CENTER);
+		p.validate();*/
 		
-		JRadioButton rdbtnF7 = new JRadioButton("F7");
-		rdbtnF7.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnF7.setForeground(new Color(128, 0, 128));
-		rdbtnF7.setBounds(6, 56, 51, 23);
-		rdbtnF7.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnF7);
-		rdbtnF7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		
-		JRadioButton rdbtnF3 = new JRadioButton("F3");
-		rdbtnF3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnF3.setForeground(new Color(0, 128, 0));
-		rdbtnF3.setBounds(6, 90, 51, 23);
-		rdbtnF3.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnF3);
-		rdbtnF3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnFC5 = new JRadioButton("FC5");
-		rdbtnFC5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnFC5.setForeground(new Color(184, 134, 11));
-		rdbtnFC5.setBounds(6, 122, 51, 23);
-		rdbtnFC5.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnFC5);
-		rdbtnFC5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnT7 = new JRadioButton("T7");
-		rdbtnT7.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnT7.setForeground(new Color(0, 0, 128));
-		rdbtnT7.setBounds(6, 153, 51, 23);
-		rdbtnT7.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnT7);
-		rdbtnT7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnP7 = new JRadioButton("P7");
-		rdbtnP7.setForeground(new Color(178, 34, 34));
-		rdbtnP7.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnP7.setBounds(6, 187, 51, 23);
-		rdbtnP7.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnP7);
-		rdbtnP7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnO1 = new JRadioButton("O1");
-		rdbtnO1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnO1.setForeground(new Color(105, 105, 105));
-		rdbtnO1.setBounds(6, 222, 51, 23);
-		rdbtnO1.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnO1);
-		rdbtnO1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		JRadioButton rdbtnO2 = new JRadioButton("O2");
-		rdbtnO2.setForeground(new Color(255, 182, 193));
-		rdbtnO2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnO2.setBounds(6, 255, 51, 23);
-		rdbtnO2.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnO2);
-		rdbtnO2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnP8 = new JRadioButton("P8");
-		rdbtnP8.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnP8.setForeground(new Color(0, 255, 255));
-		rdbtnP8.setBounds(6, 286, 51, 23);
-		rdbtnP8.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnP8);
-		rdbtnP8.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnT8 = new JRadioButton("T8");
-		rdbtnT8.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnT8.setForeground(new Color(255, 0, 255));
-		rdbtnT8.setBounds(6, 317, 51, 23);
-		rdbtnT8.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnT8);
-		rdbtnT8.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnFC6 = new JRadioButton("FC6");
-		rdbtnFC6.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnFC6.setForeground(new Color(255, 215, 0));
-		rdbtnFC6.setBounds(6, 348, 51, 23);
-		rdbtnFC6.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnFC6);
-		rdbtnFC6.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnF4 = new JRadioButton("F4");
-		rdbtnF4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnF4.setForeground(new Color(0, 0, 205));
-		rdbtnF4.setBounds(6, 379, 51, 23);
-		rdbtnF4.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnF4);
-		rdbtnF4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnF8 = new JRadioButton("F8");
-		rdbtnF8.setForeground(new Color(50, 205, 50));
-		rdbtnF8.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnF8.setBounds(6, 410, 51, 23);
-		rdbtnF8.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnF8);
-		rdbtnF8.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnAF4 = new JRadioButton("AF4");
-		rdbtnAF4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnAF4.setForeground(new Color(255, 0, 0));
-		rdbtnAF4.setBounds(6, 444, 51, 23);
-		rdbtnAF4.setBackground(Color.WHITE);
-		tabPanel.add(rdbtnAF4);
-		rdbtnAF4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton rdbtnHR = new JRadioButton("HR");
-		rdbtnHR.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnHR.setBackground(Color.WHITE);
-		rdbtnHR.setBounds(6, 477, 51, 23);
-		tabPanel.add(rdbtnHR);
-		rdbtnHR.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		
 		JCheckBox chckbxALL = new JCheckBox("All");
 		chckbxALL.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -428,7 +283,7 @@ public class MainView extends JFrame {
 		chckbxALL.setBounds(6, 514, 51, 23);
 		tabPanel.add(chckbxALL);
 		tabPanel.validate();
-		rdbtnHR.addActionListener(new ActionListener() {
+		chckbxALL.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
@@ -456,141 +311,7 @@ public class MainView extends JFrame {
 		fftPanel.setBounds(290, 452, 743, 245);
 		tabPanel_1.add(fftPanel);
 		
-		
-		JRadioButton radioButton = new JRadioButton("AF3");
-		radioButton.setBackground(Color.WHITE);
-		radioButton.setBounds(63, 116, 51, 23);
-		tabPanel_1.add(radioButton);
-		radioButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_1 = new JRadioButton("F7");
-		radioButton_1.setBackground(Color.WHITE);
-		radioButton_1.setBounds(63, 147, 51, 23);
-		tabPanel_1.add(radioButton_1);
-		radioButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_2 = new JRadioButton("F3");
-		radioButton_2.setBackground(Color.WHITE);
-		radioButton_2.setBounds(63, 178, 51, 23);
-		tabPanel_1.add(radioButton_2);
-		radioButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_3 = new JRadioButton("FC5");
-		radioButton_3.setBackground(Color.WHITE);
-		radioButton_3.setBounds(63, 209, 51, 23);
-		tabPanel_1.add(radioButton_3);
-		radioButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_4 = new JRadioButton("T7");
-		radioButton_4.setBackground(Color.WHITE);
-		radioButton_4.setBounds(63, 240, 51, 23);
-		tabPanel_1.add(radioButton_4);
-		radioButton_4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_5 = new JRadioButton("P7");
-		radioButton_5.setBackground(Color.WHITE);
-		radioButton_5.setBounds(63, 274, 51, 23);
-		tabPanel_1.add(radioButton_5);
-		radioButton_5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_6 = new JRadioButton("O1");
-		radioButton_6.setBackground(Color.WHITE);
-		radioButton_6.setBounds(63, 305, 51, 23);
-		tabPanel_1.add(radioButton_6);
-		radioButton_6.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_7 = new JRadioButton("O2");
-		radioButton_7.setBackground(Color.WHITE);
-		radioButton_7.setBounds(137, 116, 51, 23);
-		tabPanel_1.add(radioButton_7);
-		radioButton_7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_8 = new JRadioButton("P8");
-		radioButton_8.setBackground(Color.WHITE);
-		radioButton_8.setBounds(137, 147, 51, 23);
-		tabPanel_1.add(radioButton_8);
-		radioButton_8.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_9 = new JRadioButton("T8");
-		radioButton_9.setBackground(Color.WHITE);
-		radioButton_9.setBounds(137, 178, 51, 23);
-		tabPanel_1.add(radioButton_9);
-		radioButton_9.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_10 = new JRadioButton("FC6");
-		radioButton_10.setBackground(Color.WHITE);
-		radioButton_10.setBounds(137, 209, 51, 23);
-		tabPanel_1.add(radioButton_10);
-		radioButton_10.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_11 = new JRadioButton("F4");
-		radioButton_11.setBackground(Color.WHITE);
-		radioButton_11.setBounds(137, 240, 51, 23);
-		tabPanel_1.add(radioButton_11);
-		radioButton_11.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_12 = new JRadioButton("F8");
-		radioButton_12.setBackground(Color.WHITE);
-		radioButton_12.setBounds(137, 271, 51, 23);
-		tabPanel_1.add(radioButton_12);
-		radioButton_12.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_13 = new JRadioButton("AF4");
-		radioButton_13.setBackground(Color.WHITE);
-		radioButton_13.setBounds(137, 302, 51, 23);
-		tabPanel_1.add(radioButton_13);
-		radioButton_13.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JRadioButton radioButton_14 = new JRadioButton("HR");
-		radioButton_14.setBackground(Color.WHITE);
-		radioButton_14.setBounds(63, 346, 51, 23);
-		tabPanel_1.add(radioButton_14);
-		radioButton_14.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		ChannelButtonsFFT channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);
 		
 		JCheckBox checkBox = new JCheckBox("Hanning");
 		checkBox.setBackground(Color.WHITE);

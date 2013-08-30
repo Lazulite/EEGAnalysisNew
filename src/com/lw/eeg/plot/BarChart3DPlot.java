@@ -2,6 +2,8 @@ package com.lw.eeg.plot;
 
 import java.awt.Color;
 
+import javax.xml.bind.Marshaller.Listener;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -14,32 +16,39 @@ import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.Dataset;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
 import com.lw.eeg.data.Data;
 
 
-public class BarChart3DPlot {
+public  class BarChart3DPlot implements DatasetChangeListener {
 	private JFreeChart chart;
 	private DefaultCategoryDataset dataset;
 	
+	
     public BarChart3DPlot() {
-    	
         final CategoryDataset dataset = createDataset();
-        //System.err.println("after create dataset");
-        chart = createChart(dataset);
-        //System.err.println("after create chart");
-       
+        JFreeChart chart = createChart(dataset);
     }
 
     
     public void updateDataset(double[] data){
-    	 dataset.setValue(data[0], dataset.getRowKey(0), dataset.getColumnKey(0));
-    	 dataset.setValue(data[1], dataset.getRowKey(1), dataset.getColumnKey(1));
-    	 dataset.setValue(data[2], dataset.getRowKey(2), dataset.getColumnKey(2));
-    	 dataset.setValue(data[3], dataset.getRowKey(3), dataset.getColumnKey(3));
+	    
+		dataset.setValue(data[0], dataset.getRowKey(0), dataset.getColumnKey(0));
+		dataset.setValue(data[1], dataset.getRowKey(1), dataset.getColumnKey(1));
+		dataset.setValue(data[2], dataset.getRowKey(2), dataset.getColumnKey(2));
+		dataset.setValue(data[3], dataset.getRowKey(3), dataset.getColumnKey(3));
+//    	dataset.addValue(data[0], "1", "Delta");
+//        dataset.addValue(data[1], "2", "Theta");
+//        dataset.addValue(data[2], "3", "Alpha");
+//        dataset.addValue(data[3], "4", "Beta");
+		//System.err.println("update");
+		//dataset.clear();
     }
+    
     private CategoryDataset createDataset() {
 
         dataset = new DefaultCategoryDataset();
@@ -47,18 +56,13 @@ public class BarChart3DPlot {
         dataset.addValue(0.00, "2", "Theta");
         dataset.addValue(0.00, "3", "Alpha");
         dataset.addValue(0.00, "4", "Beta");
-        
-//        
-//        dataset.addValue(5.0, "1", "Delta");   
-//        dataset.addValue(4.0, "2", "Theta");   
-//        dataset.addValue(9.0, "3", "Alpha");   
-//        dataset.addValue(9.0, "4", "Beta");    
+        //dataset.addChangeListener(this); 
         return dataset;
     }
 
     private JFreeChart createChart(final CategoryDataset dataset) {
         
-        final JFreeChart chart = ChartFactory.createBarChart3D(
+        chart = ChartFactory.createBarChart3D(
             "",      // chart title
             "",               // domain axis label
             "",                  // range axis label
@@ -91,5 +95,13 @@ public class BarChart3DPlot {
     public JFreeChart getChart(){
     	return chart;
     }
+
+
+	@Override
+	public void datasetChanged(DatasetChangeEvent arg0) {
+		// TODO Auto-generated method stub
+//		newchart = createChart(dataset);
+//		System.err.println("Chanege1!!!");
+	}
 
 }

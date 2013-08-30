@@ -10,6 +10,7 @@ public class FeaturesCalc {
 	private static double[][] avgFeatureAF3;
 	private static double[] paras;
 	private static String windowType = "HANNING";
+	private static double[] fftresult;
 	
 	
 	public FeaturesCalc(String[][] _data){
@@ -29,7 +30,9 @@ public class FeaturesCalc {
 	public double[][] getAvgFeatures(){
 		return avgFeatureAF3;
 	}
-	
+	public double[] getFFTResult(){
+		return fftresult;
+	}
 
 	public static void calc( String[][] adjeegdata){
 		//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
@@ -58,7 +61,7 @@ public class FeaturesCalc {
 					feature=new FeatureExtraction(segment,segment.length);
 					feature.applyWindowFunc(windowType);
 					feature.applyFFT();
-			        //double[] fftresult= feature.getFFTresult();
+					double[] fftbuf= feature.getFFTresult();
 			        feature.calcEEGFeature();
 			        double[] features=feature.getFeature();
 	 
@@ -76,7 +79,7 @@ public class FeaturesCalc {
 				        } 
 						if(ch==1){
 							System.arraycopy(featuresbuf, 0, avgFeatureAF3[fftnum], 0, 4);
-							System.err.println("fftnum "  + fftnum +"  ");
+							//System.err.println("fftnum "  + fftnum +"  ");
 //							for(double d:avgFeatureAF3[fftnum]){
 //								System.err.println("ch=1  " + d);
 //							}

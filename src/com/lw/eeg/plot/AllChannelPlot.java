@@ -60,7 +60,6 @@ public class AllChannelPlot {
         i=0;
     	final DynamicTimeSeriesCollection dataset = new DynamicTimeSeriesCollection(16, COUNT, new Second());
     	dataset.setTimeBase(new Second(0, 0, 0, 1, 1, 2011));
-    	float[] buf =new float[]{0};
     	
     	
     	//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
@@ -180,7 +179,7 @@ public class AllChannelPlot {
         final JFreeChart result = ChartFactory.createTimeSeriesChart("", "", "", dataset, true, true, false);
         final XYPlot plot = result.getXYPlot();
         plot.getRenderer().setSeriesVisibleInLegend(false);
-        plot.setBackgroundPaint(Color.white);
+        plot.setBackgroundPaint(Color.black);
         ValueAxis domain = plot.getDomainAxis();
         domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
