@@ -179,7 +179,10 @@ public class AllChannelPlot {
         final JFreeChart result = ChartFactory.createTimeSeriesChart("", "", "", dataset, true, true, false);
         final XYPlot plot = result.getXYPlot();
         plot.getRenderer().setSeriesVisibleInLegend(false);
-        plot.setBackgroundPaint(Color.black);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.black);
+        plot.setRangeGridlinePaint(Color.black);
+        plot.clearRangeMarkers();
         ValueAxis domain = plot.getDomainAxis();
         domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();

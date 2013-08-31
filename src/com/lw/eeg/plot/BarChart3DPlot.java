@@ -74,9 +74,11 @@ public  class BarChart3DPlot implements DatasetChangeListener {
         );
 
         final CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.black);
-        plot.setRangeZeroBaselinePaint(Color.black);
-        plot.setDomainCrosshairPaint(Color.black);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.black);
+        plot.setRangeGridlinePaint(Color.black);
+        //plot.setRangeZeroBaselinePaint(Color.black);
+        //plot.setDomainCrosshairPaint(Color.black);
         final CategoryAxis axis = plot.getDomainAxis();
         
 //        axis.setCategoryLabelPositions(

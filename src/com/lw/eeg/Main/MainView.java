@@ -49,10 +49,10 @@ public class MainView extends JFrame {
 		}
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainView.class.getResource("/com/lw/gui/resource/brain_spawn.png")));
-		setTitle("EEGTerminator");
+		setTitle("JHealth");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//setBounds(100, 50, 1200, 700);
-		setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		setBounds(100, 50, 1200, 700);
+		//setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		// Menu Panel
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -117,7 +117,6 @@ public class MainView extends JFrame {
 
 		JButton btnLoad = new JButton("");
 		btnLoad.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/brainstorming.png")));
-		
 		btnLoad.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
 				System.out.println("Load Data");
@@ -181,6 +180,7 @@ public class MainView extends JFrame {
 								singleChannelp.validate();
 							}
 							
+							
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -229,13 +229,22 @@ public class MainView extends JFrame {
 		});
 	
 
-		JButton btnCapture = new JButton("");
-		btnCapture.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/photo.png")));
-		btnCapture.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		JButton btnVideo = new JButton("");
+		btnVideo.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/video_information_32.png")));
+		btnVideo.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+
+				VLCPlayer vlcPlayer = new VLCPlayer();
+				vlcPlayer.play();
+
 			}
 		});
 		
+		JButton btnStop = new JButton("");
+		btnStop.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/stop.png")));
+		
+		JButton btnCapture = new JButton("");
+		btnCapture.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/photo.png")));
 	
 		
 
@@ -252,7 +261,7 @@ public class MainView extends JFrame {
 		tabPanel.setLayout(null);
 		
 		allChannelPanel = new JPanel();
-		allChannelPanel.setBounds(63, 6, 1150, 478);
+		allChannelPanel.setBounds(63, 6, 1150, 534);
 		tabPanel.add(allChannelPanel);
 		allChannelPanel.setLayout(new BorderLayout(0, 0));
 		///XXXX
@@ -263,7 +272,7 @@ public class MainView extends JFrame {
 
 	
 		singleChannelPanel = new JPanel();
-		singleChannelPanel.setBounds(63, 494, 1150, 173);
+		singleChannelPanel.setBounds(63, 550, 1150, 117);
 		tabPanel.add(singleChannelPanel);
 		singleChannelPanel.setLayout(new BorderLayout(0, 0));
 		
@@ -355,6 +364,8 @@ public class MainView extends JFrame {
 		tabPanel_2.setLayout(null);
 		
 		
+		
+		
 		//UIManager.put("TabbedPane.selected", Color.black);
 		
 		
@@ -368,10 +379,13 @@ public class MainView extends JFrame {
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
 							.addComponent(btnLoad_1, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
 							.addComponent(btnLoad, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
-							.addComponent(btnCapture, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
-							.addComponent(btnAnalysis, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
 							.addComponent(btnStart, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+							.addComponent(btnVideo, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+							.addComponent(btnAnalysis, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE))
+						.addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE))
 					.addGap(12)
 					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 1047, Short.MAX_VALUE))
 		);
@@ -385,13 +399,17 @@ public class MainView extends JFrame {
 					.addGap(18)
 					.addComponent(btnStart)
 					.addGap(18)
+					.addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
 					.addComponent(btnAnalysis)
 					.addGap(18)
-					.addComponent(btnCapture)
-					.addGap(69)
-					.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 274, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(119, Short.MAX_VALUE))
-				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+					.addComponent(btnVideo)
+					.addGap(18)
+					.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+					.addGap(27)
+					.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(89, Short.MAX_VALUE))
+				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
 		);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);

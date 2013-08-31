@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import org.junit.runner.notification.StoppedByUserException;
 
 
 import com.lw.eeg.data.CSVHelper;
@@ -18,14 +21,30 @@ import com.sun.jna.ptr.IntByReference;
 public class EEGLog {
 	static int y1 = 0;
 	public static boolean EEG_CONNECT = false;
+	public Thread_EEG eeg;
 	public EEGLog(){
-		Thread_EEG eeg = new Thread_EEG();
+		eeg = new Thread_EEG();
 		eeg.setDaemon(true);
 		eeg.start();
-}
+	}
+	@SuppressWarnings("deprecation")
+	public void stopRecord(){
+		eeg.stop();
+	}
+	
+	public List<List<String>> getRawEEG(){
+		return eeg.getEEG();
+	}
+	public List<List<String>> getRawEState(){
+		return eeg.getEState();
+	}
 
 
 class Thread_EEG extends Thread{
+	
+	public List<List<String>> raweeg = new ArrayList<List<String>>();
+	public List<List<String>> rawestate = new ArrayList<List<String>>();
+	
 	public void run(){
     	Pointer eEvent				= Edk.INSTANCE.EE_EmoEngineEventCreate();
     	Pointer eState				= Edk.INSTANCE.EE_EmoStateCreate();
@@ -38,6 +57,8 @@ class Thread_EEG extends Thread{
     	boolean readytocollect 		= false;
     	int eventType=0;
     	double oldtime=0.0000;
+    	//List<List<String>> raweeg = new ArrayList<List<String>>();
+    	//List<List<String>> rawestate = new ArrayList<List<String>>();
     	
     	userID 			= new IntByReference(0);
 		nSamplesTaken	= new IntByReference(0);
@@ -127,16 +148,18 @@ class Thread_EEG extends Thread{
 						System.out.println(nSamplesTaken.getValue());
 						
 						double[] data = new double[nSamplesTaken.getValue()];
+						List<String> innereeg = new ArrayList();
 						
 						for (int sampleIdx=0 ; sampleIdx<nSamplesTaken.getValue() ; ++ sampleIdx) {
+							Date date= new Date();
+							String timestamp=String.valueOf(date.getTime());
+							double currenttime = EmoState.INSTANCE.ES_GetTimeFromStart(eState);
+							
 							for (int i = 0 ; i < 24 ; i++) {
 								
 								Edk.INSTANCE.EE_DataGet(hData, i, data, nSamplesTaken.getValue());
-
-								
 								String element=String.valueOf(data[sampleIdx]);
-								Date date= new Date();
-								String timestamp=String.valueOf(date.getTime());
+						
 								
 								if (i==0){
 									csvHelper1.writeCSV(element+",");
@@ -149,10 +172,20 @@ class Thread_EEG extends Thread{
 								System.out.print("["+i+"]");
 								System.out.print(data[sampleIdx]);
 								System.out.print(",");
+								
+								innereeg.add(element);
+								
 							}
+							innereeg.add(String.valueOf(currenttime));
+							innereeg.add(timestamp);
+						    for(int s=0; s<innereeg.size();s++){
+						    	System.out.print(innereeg.get(s));
+						    }
 						    
 							System.out.println();
 						}
+						
+						raweeg.add(innereeg);
 					}
 				}
 				
@@ -165,7 +198,7 @@ class Thread_EEG extends Thread{
 					double currenttime = EmoState.INSTANCE.ES_GetTimeFromStart(eState);
 					b = new BigDecimal(currenttime); 
 					currenttime = b.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue(); 
-					
+					List<String> innerestate = new ArrayList();
 					if(currenttime-oldtime>0.0001){
 						oldtime=currenttime;
 						double[] emoState = new double[5];
@@ -183,8 +216,14 @@ class Thread_EEG extends Thread{
 							
 						}
 						csvHelper2.writeCSV(EmoState.INSTANCE.ES_GetTimeFromStart(eState)+","+timestamp+"\n");
+						for(double d:emoState){	
+							innerestate.add(String.valueOf(d));
+						}
+						rawestate.add(innerestate);
 					}
 				}
+				
+				
 			}
 		}
     	
@@ -193,7 +232,15 @@ class Thread_EEG extends Thread{
     	Edk.INSTANCE.EE_EmoEngineEventFree(eEvent);
     	System.out.println("Disconnected!");
     }
+	public List<List<String>> getEEG(){
+		return raweeg;
+	}
+	public  List<List<String>> getEState(){
+		return rawestate;
+	}
+	
+	
 }
-
+	
 
 }

@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/junit-4.7.jar"/>
 	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/opencsv-2.3.jar"/>
 	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/weka.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/jna-3.5.2.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/platform-3.5.2.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/vlcj-2.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
