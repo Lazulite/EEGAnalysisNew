@@ -29,7 +29,6 @@ public class MediaPlayer {
 			//ourFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			ourFrame.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e){
-					System.err.println("windowClosing");
 					ourFrame.dispose();
 					ourMediaPlayer.getMediaPlayer().stop();
 				}

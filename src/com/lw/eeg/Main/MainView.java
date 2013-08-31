@@ -14,6 +14,8 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartPanel;
 
@@ -34,6 +36,8 @@ public class MainView extends JFrame {
 	//private static FeaturesCalc fCalc;
 	private String[][] adjeegdata;
 	private ChannelButtons channelButtons;
+	private EEGLog eegLogger;
+	
 	
 	public MainView() throws Exception {
 		setPanel();
@@ -216,8 +220,13 @@ public class MainView extends JFrame {
 		
 		JButton btnStart = new JButton("");
 		btnStart.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/playback_play.png")));
-		btnStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnStart.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				eegLogger  = new EEGLog();
+				eegLogger.startRecord();
+				ChartPanel allChannelp = new ChartPanel(eegLogger.getRealtimeChart());
+				allChannelPanel.add(allChannelp, BorderLayout.CENTER);
+				allChannelp.validate();
 			}
 		});
 		
@@ -242,6 +251,12 @@ public class MainView extends JFrame {
 		
 		JButton btnStop = new JButton("");
 		btnStop.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/stop.png")));
+		btnStop.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				eegLogger.stopRecord();
+				
+			}
+		});
 		
 		JButton btnCapture = new JButton("");
 		btnCapture.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/photo.png")));
@@ -255,6 +270,22 @@ public class MainView extends JFrame {
 		 	//tabbedPane.setTabComponentAt(0, new JLabel("Tab"));
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		ChangeListener changeListener = new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+		        int index = sourceTabbedPane.getSelectedIndex();
+		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
+		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
+		        	allChannelPanel.removeAll();
+		        }
+		        if(sourceTabbedPane.getTitleAt(index) == "Raw Data"){
+		        }
+			}
+		 };
+		
+		
+		tabbedPane.addChangeListener(changeListener);
 		JPanel tabPanel = new JPanel();
 		tabPanel.setBackground(new Color(255, 255, 255));
 		tabbedPane.addTab("Raw Data", null, tabPanel, null);
@@ -357,14 +388,6 @@ public class MainView extends JFrame {
 		
 		
 		
-		// Tab panel3
-		JPanel tabPanel_2 = new JPanel();
-		tabPanel_2.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab("Estate", null, tabPanel_2, null);
-		tabPanel_2.setLayout(null);
-		
-		
-		
 		
 		//UIManager.put("TabbedPane.selected", Color.black);
 		
@@ -411,6 +434,30 @@ public class MainView extends JFrame {
 					.addContainerGap(89, Short.MAX_VALUE))
 				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
 		);
+		
+		
+		
+		// Tab panel3
+		JPanel tabPanel_2 = new JPanel();
+		tabPanel_2.setBackground(new Color(255, 255, 255));
+		tabbedPane.addTab("Estate", null, tabPanel_2, null);
+		tabPanel_2.setLayout(null);
+		
+		JPanel estatePanel = new JPanel();
+		estatePanel.setBounds(89, 10, 864, 242);
+		tabPanel_2.add(estatePanel);
+		
+		JCheckBox chckbxNaiveBayes = new JCheckBox("NaiveBayes");
+		chckbxNaiveBayes.setBounds(756, 314, 103, 23);
+		tabPanel_2.add(chckbxNaiveBayes);
+		
+		JCheckBox chckbxTreeJ48 = new JCheckBox("TreeJ48");
+		chckbxTreeJ48.setBounds(756, 373, 103, 23);
+		tabPanel_2.add(chckbxTreeJ48);
+		
+		JTextArea wekaText = new JTextArea();
+		wekaText.setBounds(89, 271, 609, 305);
+		tabPanel_2.add(wekaText);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addTab("Analysis", null, tabbedPane_1, null);

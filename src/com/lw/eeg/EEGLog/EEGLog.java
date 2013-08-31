@@ -1,4 +1,7 @@
 package com.lw.eeg.EEGLog;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,7 +13,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
+import javax.swing.Timer;
+import javax.swing.text.StyledEditorKit.ForegroundAction;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.DynamicTimeSeriesCollection;
+import org.jfree.data.time.Second;
+import org.jfree.data.xy.XYDataset;
 import org.junit.runner.notification.StoppedByUserException;
 
 
@@ -19,17 +33,37 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
 public class EEGLog {
-	static int y1 = 0;
-	public static boolean EEG_CONNECT = false;
-	public Thread_EEG eeg;
+	public boolean EEG_CONNECT = false;
+	public volatile Thread_EEG eeg;
+	public Thread_Plot plot;
+	public boolean EEGUPDATE = false;
+	public boolean ESTATEUPDATE = false;
+	public List<String> EEGmessageList;
+	public List<String> EstatemessageList;
+	public int pCounter=0;
+	public int cCounter=0;
+	public List<List<String>> raweeg;
+	public List<List<String>> rawestate;
+	
+	
 	public EEGLog(){
 		eeg = new Thread_EEG();
+		plot = new Thread_Plot();
+		raweeg = new ArrayList<List<String>>();
+		rawestate = new ArrayList<List<String>>();
 		eeg.setDaemon(true);
-		eeg.start();
 	}
+	
+	public void startRecord(){
+		eeg.start();
+		plot.init();
+	}
+	
 	@SuppressWarnings("deprecation")
 	public void stopRecord(){
-		eeg.stop();
+		eeg=null;
+		//EEG_CONNECT = false;
+		System.err.println("Stop EEG Record");
 	}
 	
 	public List<List<String>> getRawEEG(){
@@ -38,12 +72,13 @@ public class EEGLog {
 	public List<List<String>> getRawEState(){
 		return eeg.getEState();
 	}
-
+	public JFreeChart getRealtimeChart(){
+		return plot.getChart();
+	}
+	
 
 class Thread_EEG extends Thread{
-	
-	public List<List<String>> raweeg = new ArrayList<List<String>>();
-	public List<List<String>> rawestate = new ArrayList<List<String>>();
+
 	
 	public void run(){
     	Pointer eEvent				= Edk.INSTANCE.EE_EmoEngineEventCreate();
@@ -143,17 +178,19 @@ class Thread_EEG extends Thread{
 				if (nSamplesTaken != null)
 				{
 					if (nSamplesTaken.getValue() != 0) {
-						
+						EEG_CONNECT = true;
 						System.out.print("Updated: ");
 						System.out.println(nSamplesTaken.getValue());
-						
 						double[] data = new double[nSamplesTaken.getValue()];
-						List<String> innereeg = new ArrayList();
+						//List<String> innereeg = new ArrayList();
+						
 						
 						for (int sampleIdx=0 ; sampleIdx<nSamplesTaken.getValue() ; ++ sampleIdx) {
 							Date date= new Date();
 							String timestamp=String.valueOf(date.getTime());
 							double currenttime = EmoState.INSTANCE.ES_GetTimeFromStart(eState);
+							
+							List<String> innereeg = new ArrayList();
 							
 							for (int i = 0 ; i < 24 ; i++) {
 								
@@ -163,29 +200,40 @@ class Thread_EEG extends Thread{
 								
 								if (i==0){
 									csvHelper1.writeCSV(element+",");
-								}else if(i>2 && i<21){
+								}else if(i>2 && i<17){
+									csvHelper1.writeCSV( element+",");
+									innereeg.add(element);
+								}else if(i>16 && i<21){
 									csvHelper1.writeCSV( element+",");
 								}else if(i==22){
 									csvHelper1.writeCSV(timestamp+"\n");
 								}
+//								
+//								System.out.print("["+i+"]");
+//								System.out.print(data[sampleIdx]);
+//								System.out.print(",");
 								
-								System.out.print("["+i+"]");
-								System.out.print(data[sampleIdx]);
-								System.out.print(",");
 								
-								innereeg.add(element);
 								
 							}
 							innereeg.add(String.valueOf(currenttime));
 							innereeg.add(timestamp);
-						    for(int s=0; s<innereeg.size();s++){
-						    	System.out.print(innereeg.get(s));
-						    }
-						    
+
 							System.out.println();
+							
+							//System.err.println("Updated innereeg size " + innereeg.size());
+
+								raweeg.add(innereeg);
+								//innereeg.clear();
+								EEGUPDATE= true;
+								pCounter++; 
+								//System.err.println("Pcounter " + pCounter);
+
+							System.out.println("raweeg : =>" + raweeg.size());
 						}
+						//After get a entire EEG data point, put it into Message
+					
 						
-						raweeg.add(innereeg);
 					}
 				}
 				
@@ -193,7 +241,7 @@ class Thread_EEG extends Thread{
 				if(eventType == Edk.EE_Event_t.EE_EmoStateUpdated.ToInt()){
 					Edk.INSTANCE.EE_EmoEngineEventGetEmoState(eEvent, eState);
 					//System.err.println("Estate: " + EmoState.INSTANCE.ES_GetTimeFromStart(eState));
-					
+					ESTATEUPDATE = true;
 					BigDecimal b = new BigDecimal(oldtime);  
 					double currenttime = EmoState.INSTANCE.ES_GetTimeFromStart(eState);
 					b = new BigDecimal(currenttime); 
@@ -223,7 +271,6 @@ class Thread_EEG extends Thread{
 					}
 				}
 				
-				
 			}
 		}
     	
@@ -232,6 +279,14 @@ class Thread_EEG extends Thread{
     	Edk.INSTANCE.EE_EmoEngineEventFree(eEvent);
     	System.out.println("Disconnected!");
     }
+	private synchronized void putEEGMessage(List<String> innereeg) throws InterruptedException { 	        
+		EEGmessageList = new ArrayList<String>();
+		//System.arraycopy(innereeg, 0, EEGmessageList, 0, innereeg.size()-2);
+		for(int i=0; i<innereeg.size()-2; i++){
+			EEGmessageList.add(innereeg.get(i));
+		}
+	}
+	
 	public List<List<String>> getEEG(){
 		return raweeg;
 	}
@@ -242,5 +297,145 @@ class Thread_EEG extends Thread{
 	
 }
 	
+class Thread_Plot{
+	
+    private static final float MINMAX = 5500;
+    private static final int COUNT = 128;
+    
+    private static final int FAST = 1;
+    private Timer timer;
+    private JFreeChart chart;
+   
+    private int i;
+
+    public void Thread_Plot(){
+    	
+    }
+    
+    public void init(){
+    	System.err.println("At the beginning of plot thread");
+    	final DynamicTimeSeriesCollection dataset = new DynamicTimeSeriesCollection(16, COUNT, new Second());
+    	dataset.setTimeBase(new Second(0, 0, 0, 1, 1, 2011));
+    	final float[] intbuf= new float[14];
+    
+    	for(int d=0; d<14; d++)
+    	{
+    		intbuf[d]=0;
+    	}
+    	dataset.addSeries(intbuf,0, "");
+    	dataset.addSeries(intbuf,1, "");
+    	dataset.addSeries(intbuf,2, "");
+    	dataset.addSeries(intbuf,3, "");
+    	dataset.addSeries(intbuf,4, "");
+    	dataset.addSeries(intbuf,5, "");
+    	dataset.addSeries(intbuf,6, "");
+    	dataset.addSeries(intbuf,7, "");
+    	dataset.addSeries(intbuf,8, "");
+    	dataset.addSeries(intbuf,9, "");
+    	dataset.addSeries(intbuf,10, "");
+    	dataset.addSeries(intbuf,11, "");
+    	dataset.addSeries(intbuf,12, "");
+    	dataset.addSeries(intbuf,13, "");
+    	
+    	
+        chart = createChart(dataset);
+        
+        System.err.println("Before Time ActionListener");
+        if(EEGUPDATE){
+			timer = new Timer(FAST, new ActionListener() {
+				float[] newData = new float[14];
+				int n=0;
+				@Override
+				public void actionPerformed(ActionEvent e){
+					float[] buf = new float[14];
+					System.err.println("n===========================>" + n);
+					if(!raweeg.isEmpty()){
+						
+						for(int i=0; i<14; i++){
+							System.err.println("Dataponit " + i+ "   " + raweeg.get(n).get(i));
+							switch (i) {
+							case 0:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))+750;
+								break;
+							case 1:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400;
+								break;
+							case 2:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*2-750;
+								break;
+							case 3:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*3+500;
+								break;
+							case 4:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*4-100;
+								break;
+							case 5:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*5-750;
+								break;
+							case 6:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*6-750;
+								break;
+							case 7:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*7-1500;
+								break;
+							case 8:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*8-1500;
+								break;
+							case 9:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*9-1750;
+								break;
+							case 10:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*10-2350;
+								break;
+							case 11:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*11-3750;
+								break;
+							case 12:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*12-2500;
+								break;
+							case 13:
+								buf[i] = Float.valueOf(raweeg.get(n).get(i))-400*13-3350;
+								break;							
+							default:
+								break;
+							}
+				    		//buf[i] = Float.valueOf(raweeg.get(n).get(i));
+				    	}
+						System.arraycopy(buf, 0, newData, 0, 14);
+					}
+					
+					System.out.println("buf size" + buf.length + " newData size " + newData.length);
+					dataset.advanceTime();
+					dataset.appendData(newData);
+					while(n>=raweeg.size()-1){
+					}
+					n++;
+					}
+				});
+				timer.start();
+		}
+    }
+    
+    private JFreeChart createChart(final XYDataset dataset) {
+        final JFreeChart result = ChartFactory.createTimeSeriesChart("", "", "", dataset, true, true, false);
+        final XYPlot plot = result.getXYPlot();
+        plot.getRenderer().setSeriesVisibleInLegend(false);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.black);
+        plot.setRangeGridlinePaint(Color.black);
+        plot.clearRangeMarkers();
+        ValueAxis domain = plot.getDomainAxis();
+        domain.setAutoRange(true);
+        ValueAxis range = plot.getRangeAxis();
+        range.setRange(-MINMAX, MINMAX);
+        return result;
+    }
+   
+    public JFreeChart getChart(){
+    	return chart;
+    }	
+}
+
+
 
 }

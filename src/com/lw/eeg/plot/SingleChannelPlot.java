@@ -88,8 +88,5 @@ public class SingleChannelPlot {
     public JFreeChart getChart() {
         return chart;
     }
-    
-    
-    
-    
+
 }

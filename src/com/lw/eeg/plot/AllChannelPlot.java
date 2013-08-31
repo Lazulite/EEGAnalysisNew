@@ -25,14 +25,9 @@ import org.jfree.ui.RefineryUtilities;
 
 public class AllChannelPlot {
 
-    private static final String TITLE = "Dynamic Series";
-    private static final String START = "Start";
-    private static final String STOP = "Stop";
     private static final float MINMAX = 5500;
-    private static final int COUNT = 2 * 200;
-    private static final int FAST = 100;
-    private static final int SLOW = FAST * 5;
-    private static final Random random = new Random();
+    private static final int COUNT = 128*10;
+    private static final int FAST = 1;
     private Timer timer;
     private JFreeChart chart;
     private String[][] rawdata;
