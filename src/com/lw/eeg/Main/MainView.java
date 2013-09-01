@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.*;
@@ -16,8 +17,14 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.TabableView;
 
 import org.jfree.chart.ChartPanel;
+import org.omg.CORBA.SystemException;
+
+import weka.classifiers.Classifier;
+import weka.core.Instances;
+import weka.core.Utils;
 
 import com.lw.eeg.data.*;
 import com.lw.eeg.EEGLog.*;
@@ -37,11 +44,23 @@ public class MainView extends JFrame {
 	private String[][] adjeegdata;
 	private ChannelButtons channelButtons;
 	private EEGLog eegLogger;
+	private String angerPath;
+	private String sleepyPath;
+	private String stressPath;
+	private String testPath;
 	
+	private int windowSize;
+	private static final int sampleRate = 128;
 	
 	public MainView() throws Exception {
 		setPanel();
 		txtrEegDataLog = new JTextArea();
+		angerPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
+		sleepyPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
+		testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
+		stressPath = null;
+		
+		
 	}
 	
 	public void setPanel()throws Exception{
@@ -157,9 +176,9 @@ public class MainView extends JFrame {
 							allChannelp.validate();
 							
 							//System.err.println("Before fCals");
-							FeaturesCalc fCalc = new FeaturesCalc(adjeegdata);
+							FeaturesCalc fCalc = new FeaturesCalc();
 							fCalc.calc(adjeegdata);
-							double[][] avgFeatureAF3 = fCalc.getAvgFeatures();
+							double[][] avgFeatureAF3 = fCalc.getAvgFeatures(); // get all features of every 5 second
 							double[] featurebuffer = new double[4];
 							//System.err.println(avgFeatureAF3[0][0] +" length :"+ avgFeatureAF3.length);
 							
@@ -232,9 +251,152 @@ public class MainView extends JFrame {
 		
 		JButton btnAnalysis = new JButton("");
 		btnAnalysis.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/lightbulb.png")));
-		btnAnalysis.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnAnalysis.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				
+				try{
+					
+				List<List<Double>> trainSet = new ArrayList<List<Double>>();
+				List<Double> temp = new ArrayList<Double>();
+				List<List<Double>> testSet = new ArrayList<List<Double>>();
+				//read tranning data
+				EEGData angerData = new EEGData(angerPath);
+				String[][] angereeg = angerData.init();
+				angereeg=angerData.readData(angerData.init());
+				String[][] angerAdj=angerData.adjustData(angereeg, 128*3,0);
+				
+				//calc Paras 
+				FeaturesCalc fCalc = new FeaturesCalc();
+				fCalc.calc(angerAdj);
+				double[] angerFeatures= fCalc.calParas(fCalc.getTotalFeature()); 
+				for(double d: angerFeatures){
+					temp.add(Double.valueOf(d));
+
+				}
+				
+				trainSet.add(temp);
+				
+//				System.err.println("tranSet.size" + trainSet.size() + "  " + trainSet.get(0).size());
+				
+				
+				// Sleepy
+				EEGData sleepyData = new EEGData(sleepyPath);
+				String[][] sleepyeeg = sleepyData.init();
+				sleepyeeg=sleepyData.readData(sleepyData.init());
+				String[][] sleepyAdj=sleepyData.adjustData(sleepyeeg, 128*3,0);
+				
+				
+				fCalc.calc(sleepyAdj);
+				double[] sleepyFeatures= fCalc.calParas(fCalc.getTotalFeature()); 
+				
+				List<Double> tempx = new ArrayList<Double>();
+				//System.err.println("!!!!!!!!!!!" + temp.size());
+				for(double d: sleepyFeatures){
+					tempx.add(Double.valueOf(d));
+					//System.err.println(d);
+				}
+				
+				trainSet.add(tempx);
+//				System.err.println("tranSet.size" + trainSet.size() + "  " + trainSet.get(0).size());
+//				for(int row=0; row<trainSet.size(); row++){
+//					System.err.println("row=============" + row);
+//					for(int col=0; col<trainSet.get(0).size(); col++)
+//					{
+//						System.out.println(trainSet.get(row).get(col));
+//					}
+//				}
+				// trainning
+
+				ARFFWraper simpleARFF = new ARFFWraper(trainSet);
+				simpleARFF.create();
+				Instances mInstances = simpleARFF.getInstances(); 
+				mInstances.setClassIndex(mInstances.numAttributes()-1);
+				
+				WekaClassifier mWeka = new WekaClassifier(mInstances);
+				Classifier classifier;
+		
+				classifier = mWeka.createClassifier("NaiveBayes");
+					
+				// test
+				// read test data
+				windowSize = 5;
+				int blockSize=sampleRate*windowSize;
+				EEGData testData = new EEGData(testPath);
+				String[][] testeeg = testData.init();
+				testeeg=testData.readData(testData.init());
+				String[][] testAdj=testData.adjustData(testeeg, 128*3,0);
+				
+				int numWindow =(int) testAdj.length/(blockSize);
+				String[][] winData = new String[blockSize][testAdj[0].length];
+				
+				for(int n=0; n<numWindow; n++){
+					
+					//System.err.println(n+" =============================");
+					winData = testData.getSegment(testAdj, n*blockSize, blockSize);
+					fCalc.calc(winData);
+					double[] winFeatures = fCalc.calParas(fCalc.getTotalFeature());
+					List<Double> testTemp = new ArrayList<Double>();
+					for(double d: winFeatures){
+						testTemp.add(Double.valueOf(d));
+					}
+					testSet.add(testTemp);
+				}
+					
+					ARFFWraper simpleARFFtest = new ARFFWraper(testSet);
+					simpleARFFtest.create();
+					Instances mtest = simpleARFFtest.getInstances(); 
+					mtest.setClassIndex(mtest.numAttributes()-1);
+					
+					mWeka.Evaluation(classifier,mtest);
+					
+
+			//		double[] dist =classifier.distributionForInstance(test.instance(i)); 
+					for (int i = 0; i < mtest.numInstances(); i++) {
+						double clsLabel = classifier.classifyInstance(mtest.instance(i));
+						double[] dist = classifier.distributionForInstance(mtest.instance(i)); 
+						System.out.print((i+1) + " - ");
+						System.out.print(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
+						System.out.print(mtest.classAttribute().value((int) clsLabel) + " => ");
+						System.out.println(Utils.arrayToString(dist));
+						//mtest.instance(i).setClassValue(clsLabel);
+					}
+					
+					
+//					double clsLabel = classifier.classifyInstance(mtest.firstInstance());
+//					double[] dist = classifier.distributionForInstance(mtest.firstInstance()); 
+//					System.err.println("Classification result");
+//					System.out.print(mtest.firstInstance().toString(mtest.classIndex()));
+////					System.out.print(mtest.classAttribute().value((int) clsLabel) + " - ");
+//					System.out.println(Utils.arrayToString(dist));
+
+				
+					
+					
+				}catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				// calc paras
+				// put into ARFF wrapper
+/*				System.err.println("before construction ");
+				ARFFWraper simpleARFFtest = new ARFFWraper(paratest);
+				System.err.println("after construction before weired things occurs");
+				simpleARFFtest.createTest();
+				System.err.println("weired things occur before this line, I made two copies of weired output");
+				Instances mtest = simpleARFF.getTestInstances(); 
+				mtest.setClassIndex(mtest.numAttributes()-1);*/
+				
+				
+				// evaluation
+/*				mWeka.Evaluation(classifier,mtest);
+				
+				double clsLabel = classifier.classifyInstance(mtest.firstInstance());
+				System.err.println("Classification result");
+				System.out.print(mtest.firstInstance().toString(mtest.classIndex()));*/
+	
 			}
+			
 		});
 	
 

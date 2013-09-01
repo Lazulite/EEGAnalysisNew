@@ -35,13 +35,10 @@ public class EEGData extends Data{
 				while (st.hasMoreTokens())
 				{
 					//get next token and store it in the array
-					
 					data[row][col] = st.nextToken();
 					col++;
 				}
 				row++;
-				//System.out.print("row : "+ row);
-				
 			}
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block

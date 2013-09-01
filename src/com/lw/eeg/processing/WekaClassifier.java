@@ -7,6 +7,8 @@ import weka.classifiers.functions.*;
 import weka.classifiers.pmml.consumer.SupportVectorMachineModel;
 import weka.classifiers.trees.*;
 import weka.core.Instances;
+import weka.core.Utils;
+
 import com.lw.eeg.processing.*;
 
 
@@ -31,6 +33,10 @@ public class WekaClassifier {
 			cModel=(Classifier) new J48();
 	        cModel.buildClassifier(mInstances);
 		}
+		if(classifier == "SVM "){
+			cModel = (Classifier) new SMO();
+			cModel.buildClassifier(mInstances);
+		}
         return cModel;
         
 	}
@@ -53,6 +59,17 @@ public class WekaClassifier {
             }
             System.out.println();
         }
+        // output predictions
+//        System.out.println("# - actual - predicted - distribution");
+//        for (int i = 0; i < test.numInstances(); i++) {
+//        double pred = cModel.classifyInstance(test.instance(i));
+//        double[] dist = cModel.distributionForInstance(test.instance(i));    
+//        System.out.print((i+1) + " - ");
+//        System.out.print(test.instance(i).toString(test.classIndex()) + " - ");
+//        System.out.print(test.classAttribute().value((int) pred) + " - ");
+//        System.out.println(Utils.arrayToString(dist));
+       // }
+        
 	}
 	
 }

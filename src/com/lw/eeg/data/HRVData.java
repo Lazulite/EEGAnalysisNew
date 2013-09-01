@@ -13,6 +13,9 @@ public class HRVData extends Data{
 		super(_filepath);
 		// TODO Auto-generated constructor stub
 	}
+	public HRVData(){
+
+	}
 	
 	protected String[][] readData(String[][] data) {
 		try {
