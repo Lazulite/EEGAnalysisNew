@@ -171,8 +171,9 @@ public class MainView extends JFrame {
 							AllChannelPlot allChannelPlot = new AllChannelPlot("xx", adjeegdata);
 							ChartPanel allChannelp = new ChartPanel(allChannelPlot.getChart());
 							allChannelPanel.add(allChannelp, BorderLayout.CENTER);
+							System.out.println("HERE!!!");
 							allChannelp.validate();
-							
+							System.out.println("out!!!");
 							//System.err.println("Before fCals");
 							FeaturesCalc fCalc = new FeaturesCalc();
 							fCalc.calc(adjeegdata);
