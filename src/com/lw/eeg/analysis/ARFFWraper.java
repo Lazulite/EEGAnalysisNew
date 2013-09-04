@@ -1,4 +1,4 @@
-package com.lw.eeg.processing;
+package com.lw.eeg.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,11 +68,12 @@ public class ARFFWraper {
 	    atts.add(new Attribute("att7"));
 	    atts.add(new Attribute("att8"));
 	    atts.add(new Attribute("att9"));
+	    atts.add(new Attribute("att10"));
 	    List classVal = new ArrayList();
 	    //classVal.add("dummy");
 	    classVal.add("A");
 	    classVal.add("B");
-	    atts.add(new Attribute("att10",classVal));
+	    atts.add(new Attribute("att11",classVal));
 //	    
 	    
 	    // 2. create Instances object 
@@ -86,7 +87,6 @@ public class ARFFWraper {
 		    for(int col=0; col<paras[0].length;col++){
 		    	vals[col]=paras[row][col];
 		    }
-
 		   
 	    	if(row==0)
 		    	vals[data.numAttributes()-1]=classVal.indexOf("A");
@@ -95,7 +95,7 @@ public class ARFFWraper {
 	    	
 	    	data.add(new  DenseInstance(1.0, vals)); 
 	    }
-	    
+	    System.out.println(data);
 	   // DataSink.write("C:\\Users\\Leslie\\Desktop\\arffData.arff", data);
     }
     
@@ -113,13 +113,14 @@ public class ARFFWraper {
 	    atts.add(new Attribute("att7"));
 	    atts.add(new Attribute("att8"));
 	    atts.add(new Attribute("att9"));
+	    atts.add(new Attribute("att10"));
 	    
 	    List classVal = new ArrayList();
 	    classVal.add("?");
 	    //classVal.add("A");
-	    atts.add(new Attribute("att10",classVal));
+	    atts.add(new Attribute("att11",classVal));
 
-	    tdata = new Instances("MyFeatures", (ArrayList<Attribute>) atts, 10);
+	    tdata = new Instances("MyFeatures", (ArrayList<Attribute>) atts, 10000);
 
     	double[] vals = new double[tdata.numAttributes()];
 
@@ -130,7 +131,7 @@ public class ARFFWraper {
     	vals[4] = classVal.indexOf("?");
     	tdata.add(new  DenseInstance(1.0, vals));
 
-	   // System.out.println(tdata);
+	    System.out.println(tdata);
 	    //DataSink.write("C:\\Users\\Leslie\\Desktop\\arffData.arff", data);
     }
 

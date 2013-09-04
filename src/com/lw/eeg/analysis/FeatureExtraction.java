@@ -1,4 +1,4 @@
-package com.lw.eeg.processing;
+package com.lw.eeg.analysis;
 
 import java.awt.geom.AffineTransform;
 
@@ -10,13 +10,13 @@ public class FeatureExtraction {
 	private double[] beforewindow;
 	private double[] afterfft;
 	private double[] feature;
+	private double[] hrvFeature;
 	private int size;
 	private double fs=128;
 	
 	public FeatureExtraction(double[] _data, int _size){
 		data=_data;
 		size=_size;
-		//for(double d:data)System.out.println(d);
 		beforewindow=new double[data.length];
 		System.arraycopy(data, 0, beforewindow, 0, data.length);
 	}
@@ -44,32 +44,26 @@ public class FeatureExtraction {
 
 
 		double[] spectrum = new double[fftData.length];
-		//System.out.println(fftData.length+"  =>fs"+String.valueOf(size/2-1));
 		for (int k= 0; k<size/2; k++)
 		{
 			spectrum[k] = 10*Math.log10(Math.sqrt(fftData[2*k]*fftData[2*k]  + fftData[2*k+1]*fftData[2*k+1]));
-			//spectrum[k] = Math.sqrt(fftData[2*k]*fftData[2*k]  + fftData[2*k+1]*fftData[2*k+1]);
-			//System.out.println("k:  "+k+"   "+spectrum[k]);
-
 		}
 		
 		afterfft=new double[size/2];
 		System.arraycopy(spectrum, 0, afterfft, 0, size/2);
-		//System.out.println(" fs"+ size +" data.length" + data.length);
 		
 	}
 	
 	public void calcEEGFeature(){
 		
 		double res=fs/size; 
-		feature=new double[5];
+		feature=new double[4];
 		int delta=0;
 		int theta=0;
 		int alpha=0;
 		int beta=0;
 		for(int d=0;d<afterfft.length;d++){
 			double freq=d*res ;
-			//System.out.println(" index"+d+"  "+freq+"hz : "+afterfft[d]);
 			if(freq>=1 && freq <=4){
 				feature[0]+=afterfft[d];
 				delta++;
@@ -89,11 +83,40 @@ public class FeatureExtraction {
 		feature[1]=feature[0]/theta;
 		feature[2]=feature[0]/alpha;
 		feature[3]=feature[0]/beta;
-//		for(double d:feature)
-//			System.out.println(d);
-		//return null;
-		
+
 	}
+	
+	
+	
+	public void calcHRVFeature(){
+		
+		double res=5/size; 
+		hrvFeature=new double[3];
+		int vLow=0;
+		int low=0;
+		int high=0;
+
+		for(int d=0;d<afterfft.length;d++){
+			double freq=d*res ;
+			if(freq<0.04){
+				hrvFeature[0]+=afterfft[d];
+				vLow++;
+			}else if(freq>=0.04 && freq <=0.15){
+				hrvFeature[1]+=afterfft[d];
+				low++;
+			}else if(freq>0.15 && freq<=0.4){
+				hrvFeature[2]+=afterfft[d];
+				high++;
+			}
+		}
+		
+		hrvFeature[0]=hrvFeature[0]/vLow;
+		hrvFeature[1]=hrvFeature[0]/low;
+		hrvFeature[2]=hrvFeature[0]/high;
+
+	}
+	
+	
 	
 	public double[][] sumEEGFeatures(){
 
@@ -110,6 +133,10 @@ public class FeatureExtraction {
 	}
 	public double[] getFeature(){
 		return feature;
+	}
+	
+	public double[] getHRVFeature(){
+		return hrvFeature;
 	}
 	
 }

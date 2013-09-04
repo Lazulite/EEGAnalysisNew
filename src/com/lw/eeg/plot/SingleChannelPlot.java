@@ -19,16 +19,49 @@ import org.jfree.data.xy.XYDataset;
 
 public class SingleChannelPlot {
 
-    private static final float MINMAX = 100;
-    private static final int COUNT = 2 * 200;
-    private static final int FAST = 100;
-    private static final int SLOW = FAST * 5;
+    private static float MIN = 0;
+    private static float MAX =0;
+    private static int COUNT = 0;
+    private static int FAST = 0;
     private Timer timer;
     private JFreeChart chart;
     private double[] channel;
-    private int i;
+    private int i=0;
+    private int mean=0;
+    private String type;
+    
+    public SingleChannelPlot() {    	
+    }
+    
+    public void setType(String _type){
+    	type=_type;
+    	
+    	if(type=="HRV"){
+    		COUNT=50;
+    		FAST=500;
+    		MIN=850;
+    		MAX=1200;
+    	}
+    	if(type == "HR"){
+    		COUNT=50;
+    		FAST=500;
+    		MIN=50;
+    		MAX=120;
+    	}
+    	if(type=="singleEEG")
+    	{
+    		COUNT=128*5;
+    		FAST=1;
+    		MIN=3500;
+    		MAX=5500;
+    	}
+    	if(type == "EEGFFT"){
+    		
+    	}
+    	if(type == "HRVFFT"){
+    		
+    	}
 
-    public SingleChannelPlot() {
     }
     
     public void init(){
@@ -37,14 +70,17 @@ public class SingleChannelPlot {
          
          dataset.addSeries(toDoulbe(), 0, "");
          chart = createChart(dataset);
-
          timer = new Timer(FAST, new ActionListener() {
 
              float[] newData = new float[1];
-
+            
              @Override
              public void actionPerformed(ActionEvent e) {
+            	 if(i>=channel.length-1){
+            		 newData[0]=1000;
+            	 }else{
                  newData[0] = (float) getNext();
+            	 }
                  dataset.advanceTime();
                  dataset.appendData(newData);
              }
@@ -54,7 +90,7 @@ public class SingleChannelPlot {
 
     public void setData(double[] _channel){
     	channel=_channel;
-    	System.err.println(channel[0]);
+    	System.err.println("In set Data" + System.currentTimeMillis());
     }
     
     private float[] toDoulbe() {
@@ -66,9 +102,10 @@ public class SingleChannelPlot {
 		return result;
 	}
     
+    
     private double getNext() {
     	i++;
-    	System.err.println("getNext " + channel[i]);
+    	//System.err.println("getNext " + channel[i] + "  "+i);
         return channel[i];  
     }
 
@@ -77,11 +114,14 @@ public class SingleChannelPlot {
             "", "", "", dataset, true, true, false);
         final XYPlot plot = result.getXYPlot();
         plot.getRenderer().setSeriesVisibleInLegend(false);
-        plot.setBackgroundPaint(Color.black);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.black);
+        plot.setRangeGridlinePaint(Color.black);
         ValueAxis domain = plot.getDomainAxis();
         domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
-        range.setRange(-MINMAX, MINMAX);
+        range.setAutoRange(true);
+        range.setRange(MIN, MAX);
         return result;
     }
 

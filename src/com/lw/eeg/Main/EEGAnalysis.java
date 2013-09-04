@@ -19,9 +19,9 @@ import weka.core.Instances;
 
 
 import com.lw.eeg.EEGLog.*;
+import com.lw.eeg.analysis.*;
 import com.lw.eeg.data.*;
 import com.lw.eeg.plot.*;
-import com.lw.eeg.processing.*;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 

@@ -1,5 +1,6 @@
 package com.lw.eeg.Main;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
 import com.lw.eeg.data.EEGData;
@@ -23,6 +25,7 @@ public class ChannelButtons implements ActionListener {
 	private SingleChannelPlot singleChannelPlot;
 	private EEGData eegHelper = new EEGData();
 	public boolean click = false;
+	public JPanel singleChannelPanel;
 	
 	private JRadioButton rdbtnAF3;
 	private JRadioButton rdbtnF7;
@@ -43,10 +46,11 @@ public class ChannelButtons implements ActionListener {
 	public ChannelButtons(JPanel tabPanel){
 		init(tabPanel);
 	}
+	public void setplotPanel(JPanel _sJPanel){
+		singleChannelPanel=_sJPanel;
+	}
 	public void init(JPanel tabPanel){
-		
-		
-	    
+ 
 		rdbtnAF3 = new JRadioButton("AF3");
 		rdbtnAF3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rdbtnAF3.setForeground(new Color(0, 191, 255));
@@ -200,17 +204,26 @@ public class ChannelButtons implements ActionListener {
 	    group.add(rdbtnF8);
 	    
 	    singleChannelPlot = new SingleChannelPlot();
+	    singleChannelPlot.setType("singleEEG");
 		setUnenable();
 		
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		click=true;
+		//System.out.print(click);
 		if(e.getActionCommand()!="HR"){
 			System.err.println(e.getActionCommand());
 			singleChannelPlot.setData(eegHelper.getChannel(totalData, Arrays.asList(chName).indexOf(e.getActionCommand())+1));
 			singleChannelPlot.init();
+			
+			if(!click){
+			ChartPanel singleChannelp = new ChartPanel(singleChannelPlot.getChart());
+			singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
+			singleChannelp.validate();
+			click=true;
+		}
+			
 			
 		}else {
 			
@@ -256,6 +269,7 @@ public class ChannelButtons implements ActionListener {
 	
 	
 	public JFreeChart getChart(){
+
 		return singleChannelPlot.getChart();
 	}
 	

@@ -17,7 +17,7 @@ public class HRVData extends Data{
 
 	}
 	
-	protected String[][] readData(String[][] data) {
+	public String[][] readData(String[][] data) {
 		try {
 				BufferedReader bufRdr;
 				bufRdr = new BufferedReader(new FileReader(filepath));
@@ -49,7 +49,26 @@ public class HRVData extends Data{
 			}
 			 
 			return data;
-		
 	}
+	
+	
+	public double[] getChannel(String[][] allchannel, int channel){
+		double[] specificchannel = new double[allchannel.length];
+
+		double mean=0;
+		for(int i=0; i< allchannel.length; i++){		
+			mean+=Double.valueOf(allchannel[i][channel]);
+		}
+		
+		mean=mean/allchannel.length;
+		
+		for(int i=0; i< allchannel.length; i++){
+			
+			specificchannel[i]=Double.valueOf(allchannel[i][channel]);
+		}
+		return specificchannel;
+	}
+	
+	
 	
 }

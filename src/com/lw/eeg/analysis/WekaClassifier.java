@@ -1,15 +1,16 @@
-package com.lw.eeg.processing;
+package com.lw.eeg.analysis;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.*;
+import weka.classifiers.lazy.IBk;
 import weka.classifiers.pmml.consumer.SupportVectorMachineModel;
 import weka.classifiers.trees.*;
 import weka.core.Instances;
 import weka.core.Utils;
 
-import com.lw.eeg.processing.*;
+import com.lw.eeg.analysis.*;
 
 
 public class WekaClassifier {
@@ -20,7 +21,7 @@ public class WekaClassifier {
 		mInstances=_instance;
 	}
 	
-	public Classifier createClassifier(String classifier) throws Exception{
+	public Classifier createClassifier(String classifier, int para) throws Exception{
 		
 		Classifier cModel = null;
 		if(classifier=="NaiveBayes"){
@@ -35,6 +36,14 @@ public class WekaClassifier {
 		}
 		if(classifier == "SVM "){
 			cModel = (Classifier) new SMO();
+			cModel.buildClassifier(mInstances);
+		}
+		if(classifier == "KNN"){
+			if(para==-1)
+				cModel = (Classifier) new IBk();
+			else {
+				cModel = (Classifier) new IBk(para);
+			}
 			cModel.buildClassifier(mInstances);
 		}
         return cModel;

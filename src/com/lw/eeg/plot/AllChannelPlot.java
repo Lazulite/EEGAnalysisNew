@@ -182,6 +182,8 @@ public class AllChannelPlot {
         domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
         range.setRange(-MINMAX, MINMAX);
+        range.setVisible(false);
+        
         return result;
     }
    

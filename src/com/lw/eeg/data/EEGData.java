@@ -25,8 +25,7 @@ public class EEGData extends Data{
 			String line = null;
 			int row = 0;
 			int col = 0;
-			System.out.println("size  "+data[0].length+" ;  "+data.length);
-		//read each line of text file
+			//read each line of text file
 			bufRdr.readLine();
 			while((line = bufRdr.readLine()) != null)
 			{
@@ -46,10 +45,7 @@ public class EEGData extends Data{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}/*catch (ArrayIndexOutOfBoundsException e){
-			System.out.print(e.toString());
-			e.printStackTrace();
-		}*/
+		}
 		 
 		return data;
 	}

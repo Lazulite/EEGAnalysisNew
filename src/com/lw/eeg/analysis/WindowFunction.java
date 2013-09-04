@@ -1,4 +1,4 @@
-package com.lw.eeg.processing;
+package com.lw.eeg.analysis;
 
 public class WindowFunction {
 

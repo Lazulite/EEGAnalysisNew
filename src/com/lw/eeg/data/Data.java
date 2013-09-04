@@ -31,7 +31,7 @@ public class Data {
 		
 	}
 	
-	
+	// Remove fore and remove tail for all channel
 	public String[][] adjustData(String[][] data,int fore, int tail){
 		
 		String[][] adjData= new String[data.length-fore-tail][data[0].length];
@@ -43,7 +43,7 @@ public class Data {
 		
 		return adjData;		
 	}
-	
+	 // get Segment for one specific channel
 	public double[] getSegment(double[] data, int index, int size){
 		double[] segment=new double[size];
 		for(int i=0; i<size; i++){
@@ -51,7 +51,7 @@ public class Data {
 		}
 		return segment;
 	}
-	
+	 // get Segment for all channel
 	public String[][] getSegment(String[][] data, int index, int size){
 		String[][] segment=new String[size][data[0].length];
 		for(int i=0; i<size; i++){
@@ -70,15 +70,8 @@ public class Data {
 		return temp;
 	}
 	
-	public String[][] getTotolData(String[][] eeg, String[][] hb, String[][] sensor){
-		/*for(int i=0; i < eeg.length; i++){
-			System.out.print("\n row "+i + ":   ");
-			for(int j=0; j< eeg[0].length; j++){		
-				System.out.print(eeg[i][j]);
-			}
-		}*/
-		
-		
+	public String[][] getTotalData(String[][] eeg, String[][] hb, String[][] sensor){
+
 		return null;
 	}
 
