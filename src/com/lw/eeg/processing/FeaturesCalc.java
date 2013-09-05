@@ -31,6 +31,11 @@ public class FeaturesCalc {
 		return avgFeatureAF3;
 	}
 	public double[] getFFTResult(){
+		System.out.println("FeaturesCalc.getFFTResult()");
+		System.err.println("All result are 0, fix later");
+//		for(double d: fftresult){
+//		System.out.println(d);
+//		}
 		return fftresult;
 	}
 
@@ -48,7 +53,7 @@ public class FeaturesCalc {
 				double[] featuressum=new double[4];
 	
 				double[] channel=eegData.getChannel(adjeegdata, ch);
-				
+				boolean flag = true;
 				while(Math.abs(index-adjeegdata.length)>=128){
 					
 					double[] segment=eegData.getSegment(channel, index, 128);
@@ -56,10 +61,19 @@ public class FeaturesCalc {
 					feature = new FeatureExtraction(segment,segment.length);
 					feature.applyWindowFunc(windowType);
 					feature.applyFFT();
+				
 					double[] fftbuf= feature.getFFTresult();
 			        feature.calcEEGFeature();
 			        double[] features=feature.getFeature();
-	 
+			        fftresult = new double[fftbuf.length];
+			        if(ch==1 && index>1000 &&flag){
+			        	//System.out.println("FeaturesCalc.calc() if{}");
+			        	flag=false;
+			        	System.arraycopy(fftbuf, 0, fftresult, 0, fftbuf.length);
+			        	for(double d: fftresult){
+			    		System.out.println(d);
+			        	}
+			        }
 			        for(int f=0; f<4;f++){
 			        	featuresbuf[f]+=features[f];
 			        } 
@@ -70,9 +84,9 @@ public class FeaturesCalc {
 							//System.err.println("featureBuf " + featuresbuf[f]);
 				        	featuressum[f]+=featuresbuf[f];	
 				        } 
-//						if(ch==1){
-//							System.arraycopy(featuresbuf, 0, avgFeatureAF3[fftnum], 0, 4);
-//						}
+						if(ch==1){
+							System.arraycopy(featuresbuf, 0, avgFeatureAF3[fftnum], 0, 4);
+						}
 //						fftnum++;
 					}
 					count++;

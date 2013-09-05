@@ -49,6 +49,10 @@ public class MainView extends JFrame {
 	private String stressPath;
 	private String testPath;
 	
+	private double[] paraX;
+	private double[] paraY;
+	
+	private final static String newline = "\n";
 	private int windowSize;
 	private static final int sampleRate = 128;
 	
@@ -125,6 +129,174 @@ public class MainView extends JFrame {
 		setContentPane(contentPane);
 		
 		
+		//Tab Panel Init
+		// Tab Panel
+
+		//TODO - change tab label bcolor
+			//tabbedPane.addTab(null, myComponent);
+		 	//tabbedPane.setTabComponentAt(0, new JLabel("Tab"));
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		ChangeListener changeListener = new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+		        int index = sourceTabbedPane.getSelectedIndex();
+		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
+		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
+		        	allChannelPanel.removeAll();
+		        }
+		        if(sourceTabbedPane.getTitleAt(index) == "Raw Data"){
+		        }
+			}
+		 };
+		
+		
+		tabbedPane.addChangeListener(changeListener);
+		JPanel tabPanel = new JPanel();
+		tabPanel.setBackground(new Color(255, 255, 255));
+		tabbedPane.addTab("Raw Data", null, tabPanel, null);
+		tabPanel.setLayout(null);
+		
+		allChannelPanel = new JPanel();
+		allChannelPanel.setBounds(63, 6, 1150, 534);
+		tabPanel.add(allChannelPanel);
+		allChannelPanel.setLayout(new BorderLayout(0, 0));
+		///XXXX
+//				SingleChannelPlot singleChannelPlot = new SingleChannelPlot("xx");
+//				ChartPanel p = new ChartPanel(singleChannelPlot.getChart());
+//				allChannelPanel.add(p, BorderLayout.CENTER);
+//				p.validate();
+
+	
+		singleChannelPanel = new JPanel();
+		singleChannelPanel.setBounds(63, 550, 1150, 117);
+		tabPanel.add(singleChannelPanel);
+		singleChannelPanel.setLayout(new BorderLayout(0, 0));
+		
+		channelButtons = new ChannelButtons(tabPanel);
+		/*channelButtons.setData(adjeegdata);
+		
+		ChartPanel p = new ChartPanel(channelButtons.getChart());
+		singleChannelPanel.add(p, BorderLayout.CENTER);
+		p.validate();*/
+		
+		
+		
+		JCheckBox chckbxALL = new JCheckBox("All");
+		chckbxALL.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		chckbxALL.setSelected(true);
+		chckbxALL.setBackground(Color.WHITE);
+		chckbxALL.setBounds(6, 514, 51, 23);
+		tabPanel.add(chckbxALL);
+		tabPanel.validate();
+		chckbxALL.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		
+		
+
+		
+		//Tab Panel 2
+		
+		
+		JPanel tabPanel_1 = new JPanel();
+		tabPanel_1.setBackground(new Color(255, 255, 255));
+		tabbedPane.addTab(" FFT ", null, tabPanel_1, null);
+		tabPanel_1.setLayout(null);
+		
+		
+		
+		featurePanel = new JPanel();
+		featurePanel.setBackground(new Color(255, 255, 255));
+		featurePanel.setBounds(290, 10, 743, 441);
+		tabPanel_1.add(featurePanel);
+		
+		fftPanel = new JPanel();
+		fftPanel.setBounds(290, 452, 743, 245);
+		tabPanel_1.add(fftPanel);
+		
+		ChannelButtonsFFT channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);
+		
+		JCheckBox checkBox = new JCheckBox("Hanning");
+		checkBox.setBackground(Color.WHITE);
+		checkBox.setBounds(65, 558, 74, 23);
+		tabPanel_1.add(checkBox);
+		checkBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JCheckBox checkBox_1 = new JCheckBox("Hamming");
+		checkBox_1.setBackground(Color.WHITE);
+		checkBox_1.setBounds(65, 521, 74, 23);
+		tabPanel_1.add(checkBox_1);
+		checkBox_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		JCheckBox checkBox_2 = new JCheckBox("Blackman");
+		checkBox_2.setBackground(Color.WHITE);
+		checkBox_2.setBounds(65, 478, 74, 23);
+		tabPanel_1.add(checkBox_2);
+		checkBox_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		
+		JCheckBox checkBox_3 = new JCheckBox("Rectangular");
+		checkBox_3.setBackground(Color.WHITE);
+		checkBox_3.setBounds(65, 598, 109, 23);
+		tabPanel_1.add(checkBox_3);
+		
+		
+		// Tab panel3
+		JPanel tabPanel_2 = new JPanel();
+		tabPanel_2.setBackground(new Color(255, 255, 255));
+		tabbedPane.addTab("Estate", null, tabPanel_2, null);
+		tabPanel_2.setLayout(null);
+		
+		JPanel estatePanel = new JPanel();
+		estatePanel.setBounds(168, 10, 864, 284);
+		tabPanel_2.add(estatePanel);
+		
+		JCheckBox chckbxKNN = new JCheckBox("KNN");
+		chckbxKNN.setFont(new Font("Tahoma", Font.BOLD, 16));
+		chckbxKNN.setBounds(904, 347, 103, 23);
+		tabPanel_2.add(chckbxKNN);
+		
+		JCheckBox chckbxSVM = new JCheckBox("SVM");
+		chckbxSVM.setFont(new Font("Tahoma", Font.BOLD, 16));
+		chckbxSVM.setBounds(904, 402, 103, 23);
+		tabPanel_2.add(chckbxSVM);
+		
+		JTextArea wekaText = new JTextArea();
+		wekaText.setBounds(167, 347, 609, 305);
+		tabPanel_2.add(wekaText);
+		
+		JPanel tabPanel_3 = new JPanel();
+		tabPanel_3.setBackground(new Color(255, 255, 255));
+		tabbedPane.addTab("Correlation", null, tabPanel_3, null);
+		tabPanel_3.setLayout(null);
+		
+		JPanel correlationPanel = new JPanel();
+		estatePanel.setBounds(168, 10, 864, 284);
+		tabPanel_3.add(correlationPanel);
+		
+		final JPanel scatterpanel = new JPanel();
+		scatterpanel.setBackground(Color.WHITE);
+		scatterpanel.setBounds(332, 25, 779, 473);
+		tabPanel_3.add(scatterpanel);
+		
+
+		final JTextArea correlResult = new JTextArea();
+		correlResult.setBounds(332, 508, 710, 84);
+		tabPanel_3.add(correlResult);
+		
 
 		/// TextLog
 
@@ -165,10 +337,16 @@ public class MainView extends JFrame {
 //						eeg_panel.set_on();
 						EEGData eegData = new EEGData(path);
 						String[][] eegRawData;
+						//tring emoPath="C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130816_175754_emostate.csv";
 						try {
 							eegRawData = eegData.init();
 							eegRawData=eegData.readData(eegData.init());
 							adjeegdata=eegData.adjustData(eegRawData, 128*5,128*5);
+//							
+//							EMOData emoData = new EMOData(emoPath);
+//							String[][] emoRawData = emoData.readData(emoData.init());
+//							String[][] adjEmoData=emoData.adjustData(emoRawData, 128*5, 128*5);
+							
 							
 							AllChannelPlot allChannelPlot = new AllChannelPlot("xx", adjeegdata);
 							ChartPanel allChannelp = new ChartPanel(allChannelPlot.getChart());
@@ -178,6 +356,7 @@ public class MainView extends JFrame {
 							//System.err.println("Before fCals");
 							FeaturesCalc fCalc = new FeaturesCalc();
 							fCalc.calc(adjeegdata);
+							double[] fft =fCalc.getFFTResult();
 							double[][] avgFeatureAF3 = fCalc.getAvgFeatures(); // get all features of every 5 second
 							double[] featurebuffer = new double[4];
 							//System.err.println(avgFeatureAF3[0][0] +" length :"+ avgFeatureAF3.length);
@@ -202,6 +381,15 @@ public class MainView extends JFrame {
 								singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
 								singleChannelp.validate();
 							}
+							
+							SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
+							singleLineChartPlot.setData(fft);
+							ChartPanel fftChartPanel = new ChartPanel(singleLineChartPlot.getChart());
+							fftPanel.add(fftChartPanel,BorderLayout.CENTER);
+							fftChartPanel.validate();
+							
+							
+							
 							
 							
 						} catch (Exception e1) {
@@ -422,131 +610,39 @@ public class MainView extends JFrame {
 		
 		JButton btnCapture = new JButton("");
 		btnCapture.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/photo.png")));
-	
-		
+		btnCapture.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				System.out
+				.println("MainView.setPanel().new MouseAdapter() {...}.mouseClicked()");
+				correlResult.append("Peason's correlation coefficient :" + newline);
+				Correlation correlation = new Correlation();
+				// Normalize
+				paraX = correlation.Normalize(paraX, 1, -1);
+				paraY = correlation.Normalize(paraY, 1, -1);
+				int i=0;
+				Data helper = new Data();
+				while(Math.abs(paraY.length*i - paraX.length)>=paraY.length){
+					i++;
+				}
+				paraX = helper.getSegment(paraX, 0, paraY.length*i);
+				//Scale
+				paraY = correlation.Scale(paraY, paraX.length/paraY.length);
+				
+				ScatterPlot scatterPlot = new ScatterPlot(paraX, paraY, "Long Term Excitement", "Heart rate");
+				ChartPanel scatterChartPanel = new ChartPanel(scatterPlot.createChart());
+				scatterpanel.add(scatterChartPanel, BorderLayout.CENTER);
+				scatterChartPanel.validate();
+				
 
-		// Tab Panel
+				double pearson = correlation.GetCorrelation(paraX, paraY);
+				System.out.println(pearson);
+				correlResult.append(String.valueOf(pearson) + newline);
 
-		//TODO - change tab label bcolor
-			//tabbedPane.addTab(null, myComponent);
-		 	//tabbedPane.setTabComponentAt(0, new JLabel("Tab"));
-		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		ChangeListener changeListener = new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
-		        int index = sourceTabbedPane.getSelectedIndex();
-		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
-		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
-		        	allChannelPanel.removeAll();
-		        }
-		        if(sourceTabbedPane.getTitleAt(index) == "Raw Data"){
-		        }
-			}
-		 };
-		
-		
-		tabbedPane.addChangeListener(changeListener);
-		JPanel tabPanel = new JPanel();
-		tabPanel.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab("Raw Data", null, tabPanel, null);
-		tabPanel.setLayout(null);
-		
-		allChannelPanel = new JPanel();
-		allChannelPanel.setBounds(63, 6, 1150, 534);
-		tabPanel.add(allChannelPanel);
-		allChannelPanel.setLayout(new BorderLayout(0, 0));
-		///XXXX
-//		SingleChannelPlot singleChannelPlot = new SingleChannelPlot("xx");
-//		ChartPanel p = new ChartPanel(singleChannelPlot.getChart());
-//		allChannelPanel.add(p, BorderLayout.CENTER);
-//		p.validate();
-
-	
-		singleChannelPanel = new JPanel();
-		singleChannelPanel.setBounds(63, 550, 1150, 117);
-		tabPanel.add(singleChannelPanel);
-		singleChannelPanel.setLayout(new BorderLayout(0, 0));
-		
-		channelButtons = new ChannelButtons(tabPanel);
-		/*channelButtons.setData(adjeegdata);
-		
-		ChartPanel p = new ChartPanel(channelButtons.getChart());
-		singleChannelPanel.add(p, BorderLayout.CENTER);
-		p.validate();*/
-		
-		
-		
-		JCheckBox chckbxALL = new JCheckBox("All");
-		chckbxALL.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		chckbxALL.setSelected(true);
-		chckbxALL.setBackground(Color.WHITE);
-		chckbxALL.setBounds(6, 514, 51, 23);
-		tabPanel.add(chckbxALL);
-		tabPanel.validate();
-		chckbxALL.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		
-		
-		
 
 		
-		//Tab Panel 2
-		
-		
-		JPanel tabPanel_1 = new JPanel();
-		tabPanel_1.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab(" FFT ", null, tabPanel_1, null);
-		tabPanel_1.setLayout(null);
-		
-		
-		
-		featurePanel = new JPanel();
-		featurePanel.setBackground(new Color(255, 255, 255));
-		featurePanel.setBounds(290, 10, 743, 441);
-		tabPanel_1.add(featurePanel);
-		
-		fftPanel = new JPanel();
-		fftPanel.setBounds(290, 452, 743, 245);
-		tabPanel_1.add(fftPanel);
-		
-		ChannelButtonsFFT channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);
-		
-		JCheckBox checkBox = new JCheckBox("Hanning");
-		checkBox.setBackground(Color.WHITE);
-		checkBox.setBounds(24, 536, 74, 23);
-		tabPanel_1.add(checkBox);
-		checkBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JCheckBox checkBox_1 = new JCheckBox("Hamming");
-		checkBox_1.setBackground(Color.WHITE);
-		checkBox_1.setBounds(24, 499, 74, 23);
-		tabPanel_1.add(checkBox_1);
-		checkBox_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JCheckBox checkBox_2 = new JCheckBox("Blackman");
-		checkBox_2.setBackground(Color.WHITE);
-		checkBox_2.setBounds(24, 456, 74, 23);
-		tabPanel_1.add(checkBox_2);
-		checkBox_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		
-		JCheckBox checkBox_3 = new JCheckBox("Rectangular");
-		checkBox_3.setBackground(Color.WHITE);
-		checkBox_3.setBounds(24, 576, 109, 23);
-		tabPanel_1.add(checkBox_3);
 		
 		
 		
@@ -599,30 +695,165 @@ public class MainView extends JFrame {
 		
 		
 		
-		// Tab panel3
-		JPanel tabPanel_2 = new JPanel();
-		tabPanel_2.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab("Estate", null, tabPanel_2, null);
-		tabPanel_2.setLayout(null);
 		
-		JPanel estatePanel = new JPanel();
-		estatePanel.setBounds(89, 10, 864, 242);
-		tabPanel_2.add(estatePanel);
 		
-		JCheckBox chckbxNaiveBayes = new JCheckBox("NaiveBayes");
-		chckbxNaiveBayes.setBounds(756, 314, 103, 23);
-		tabPanel_2.add(chckbxNaiveBayes);
+		JButton btnEEG = new JButton("EEG");
+		btnEEG.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				System.out.println("Load Data");
+				FileDialog dialog1 = new FileDialog(frame);
+				dialog1.setSize(300, 200);
+				dialog1.setVisible(true);
+				dialog1.setTitle("Load Emotion Data");
+				if(dialog1.getDirectory() != null){
+					StringTokenizer str = new StringTokenizer(dialog1.getFile(), ".");
+					ArrayList<String> list = new ArrayList<String>();
+					while(str.hasMoreTokens()){
+						list.add(str.nextToken());
+					}
+					int last = list.size() - 1;
+					if(list.get(last).equals("csv")){
+						String path = dialog1.getDirectory() + dialog1.getFile();
+						EMOData emoData = new EMOData(path);
+						String[][] emoRawData;
+						try{
+							emoRawData = emoData.init();
+							emoRawData = emoData.readData(emoData.init());
+							String[][] adjEmoData = emoData.adjustData(emoRawData, 4*4, 4*4);
+							double[] shortExcit = emoData.getChannel(adjEmoData, 0);
+							paraX = new double[shortExcit.length];
+							System.arraycopy(shortExcit, 0, paraX, 0, shortExcit.length);
+
+						}catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}else{
+						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
+						dialog_confirm.setLayout(new BorderLayout(0, 0));
+						dialog_confirm.setBackground(Color.WHITE);
+						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
+						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						dialog_confirm.setSize(400, 100);
+						dialog_confirm.setLocation(100, 100);
+						dialog_confirm.setVisible(true);
+						dialog_confirm.addWindowListener(new WindowAdapter() {
+							public void windowClosing(WindowEvent e){
+								dialog_confirm.dispose();
+							}
+						});
+					}
+				}
+
+
+			}
+		});
+		btnEEG.setBounds(102, 120, 93, 37);
+		tabPanel_3.add(btnEEG);
 		
-		JCheckBox chckbxTreeJ48 = new JCheckBox("TreeJ48");
-		chckbxTreeJ48.setBounds(756, 373, 103, 23);
-		tabPanel_2.add(chckbxTreeJ48);
+		JButton btnHR = new JButton("Heart Rate");
+		btnHR.setBounds(102, 187, 93, 37);
+		tabPanel_3.add(btnHR);
+		btnHR.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				FileDialog dialog2 = new FileDialog(frame);
+				dialog2.setSize(300, 200);
+				dialog2.setVisible(true);
+				dialog2.setTitle("Load HR Data");
+				if(dialog2.getDirectory() != null){
+					StringTokenizer str = new StringTokenizer(dialog2.getFile(), ".");
+					ArrayList<String> list = new ArrayList<String>();
+					while(str.hasMoreTokens()){
+						list.add(str.nextToken());
+					}
+					int last = list.size() - 1;
+					if(list.get(last).equals("csv")){
+						String path = dialog2.getDirectory() + dialog2.getFile();
+						HRVData hrvData = new HRVData(path);
+						String[][] hrvRawData;
+
+						try{
+							hrvRawData = hrvData.init();
+							hrvRawData=hrvData.readData(hrvData.init());
+							double[] hrRawData = hrvData.getChannel(hrvData.readData(hrvData.init()),1);
+							paraY = new double[hrRawData.length];
+							System.arraycopy(hrRawData, 0, paraY, 0, hrRawData.length);
+						}catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}else{
+						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
+						dialog_confirm.setLayout(new BorderLayout(0, 0));
+						dialog_confirm.setBackground(Color.WHITE);
+						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
+						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						dialog_confirm.setSize(400, 100);
+						dialog_confirm.setLocation(100, 100);
+						dialog_confirm.setVisible(true);
+						dialog_confirm.addWindowListener(new WindowAdapter() {
+							public void windowClosing(WindowEvent e){
+								dialog_confirm.dispose();
+							}
+						});
+					}
+				}
+			}
+		});
+
 		
-		JTextArea wekaText = new JTextArea();
-		wekaText.setBounds(89, 271, 609, 305);
-		tabPanel_2.add(wekaText);
+		JButton btnHRV = new JButton("HRV");
+		btnHRV.setBounds(102, 261, 93, 37);
+		tabPanel_3.add(btnHRV);
+		btnHRV.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				FileDialog dialog2 = new FileDialog(frame);
+				dialog2.setSize(300, 200);
+				dialog2.setVisible(true);
+				dialog2.setTitle("Load HR Data");
+				if(dialog2.getDirectory() != null){
+					StringTokenizer str = new StringTokenizer(dialog2.getFile(), ".");
+					ArrayList<String> list = new ArrayList<String>();
+					while(str.hasMoreTokens()){
+						list.add(str.nextToken());
+					}
+					int last = list.size() - 1;
+					if(list.get(last).equals("csv")){
+						String path = dialog2.getDirectory() + dialog2.getFile();
+						HRVData hrvData = new HRVData(path);
+						String[][] hrvRawData;
+
+						try{
+							hrvRawData = hrvData.init();
+							hrvRawData=hrvData.readData(hrvData.init());
+							double[] hrRawData = hrvData.getChannel(hrvData.readData(hrvData.init()),2);
+							paraY = new double[hrRawData.length];
+							System.arraycopy(hrRawData, 0, paraY, 0, hrRawData.length);
+						}catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}else{
+						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
+						dialog_confirm.setLayout(new BorderLayout(0, 0));
+						dialog_confirm.setBackground(Color.WHITE);
+						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
+						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						dialog_confirm.setSize(400, 100);
+						dialog_confirm.setLocation(100, 100);
+						dialog_confirm.setVisible(true);
+						dialog_confirm.addWindowListener(new WindowAdapter() {
+							public void windowClosing(WindowEvent e){
+								dialog_confirm.dispose();
+							}
+						});
+					}
+				}
+			}
+		});
+
 		
-		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.addTab("Analysis", null, tabbedPane_1, null);
+		
 
 		contentPane.setLayout(gl_contentPane);
 		
