@@ -28,6 +28,7 @@ import org.jfree.data.xy.XYDataset;
 import org.junit.runner.notification.StoppedByUserException;
 
 
+import com.lw.eeg.Main.wikiHttp;
 import com.lw.eeg.data.CSVHelper;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -44,7 +45,7 @@ public class EEGLog {
 	public int cCounter=0;
 	public List<List<String>> raweeg;
 	public List<List<String>> rawestate;
-	
+	public wikiHttp wikiHelper;
 	
 	public EEGLog(){
 		eeg = new Thread_EEG();

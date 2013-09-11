@@ -5,8 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -20,22 +25,30 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.TabableView;
 
 import org.jfree.chart.ChartPanel;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.omg.CORBA.SystemException;
 
 import weka.classifiers.Classifier;
 import weka.core.Instances;
 import weka.core.Utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.lw.eeg.data.*;
 import com.lw.eeg.EEGLog.*;
 import com.lw.eeg.plot.*;
 import com.lw.eeg.processing.*;
+import com.lw.eeg.jsonlib.*;
 
 public class MainView extends JFrame {
 	
 	private static JPanel contentPane;
 	private static JFrame frame;
-	private static JTextArea txtrEegDataLog; 
+	private static JTextArea txtLog; 
 	private static JPanel allChannelPanel; // AllChannel panel
 	private static JPanel singleChannelPanel; // Singchannel panel
 	private static JPanel featurePanel; // Feature Panel
@@ -44,7 +57,8 @@ public class MainView extends JFrame {
 	private String[][] adjeegdata;
 	private ChannelButtons channelButtons;
 	private EEGLog eegLogger;
-	private String angerPath;
+	private wikiHttp wikiHelper;
+	private String excitePath;
 	private String sleepyPath;
 	private String stressPath;
 	private String testPath;
@@ -56,12 +70,20 @@ public class MainView extends JFrame {
 	private int windowSize;
 	private static final int sampleRate = 128;
 	
+	
+    private String mtoken=null;
+    private String mBlockid=null;
+    private String rootURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/";
+    private List<String> unitids =new ArrayList<String>();
+	
 	public MainView() throws Exception {
 		setPanel();
-		txtrEegDataLog = new JTextArea();
-		angerPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
-		sleepyPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
-		testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
+		txtLog = new JTextArea();
+		//angerPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
+		//sleepyPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
+		//testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
+
+		excitePath = System.getProperty("user.dir") + "\\data\\cs2m\\20130902_225704_rawdata.csv";
 		stressPath = null;
 		
 		
@@ -85,15 +107,46 @@ public class MainView extends JFrame {
 		setJMenuBar(menuBar);
 		
 		// Menu Item
-		JMenu mnFile = new JMenu("File");
+		JMenu mnFile = new JMenu("WikiHealth");
 
 		menuBar.add(mnFile);
 		
-		JMenuItem mntmLoad = new JMenuItem("Load");
+		JMenuItem mntmLoad = new JMenuItem("Login");
 		mntmLoad.addActionListener(new ActionListener() {
+			
+			@Override
 			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Gson toJ=new Gson();
+				Loginid loginid = new Loginid("lei", "northern", 99999);
+				String login = toJ.toJson(loginid);
+
+				String logURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/users/gettoken?api_key=special-key";
+//				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
+//				nameValuePairs.add(new BasicNameValuePair("accesstoken", "b323b8a8ff6448128c7da7c7d21be233"));  
+//				nameValuePairs.add(new BasicNameValuePair("api_key", "special-key")); 
+				String unitURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/health/title/heart_rate/unit?accesstoken=b323b8a8ff6448128c7da7c7d21be233&api_key=special-key";
+				
+				wikiHelper=new wikiHttp( logURL, "POST", login, null);
+				InputStream result;
+				result = wikiHelper.doInBackground();
+				
+				Gson gson=new Gson();
+				JsonReader reader = new JsonReader(new InputStreamReader(result));
+				reader.setLenient(true);
+				JsonParser parser = new JsonParser();
+				//Log.e("RESPONSE", "before parsing json ");					
+				JsonObject obj = parser.parse(reader).getAsJsonObject();	
+				//Log.e("RESPONSE", "Before obj.toString()");
+				System.err.println("RESPONSE "+obj.toString());
+
+				JsonObject usertoken = obj.get("usertoken").getAsJsonObject();
+				System.err.println("userToken is "+usertoken.toString());
+				mtoken = usertoken.get("token").getAsString();
+				System.err.println("Token is "+mtoken);
 			}
 		});
+		
 		mnFile.add(mntmLoad);
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
@@ -144,7 +197,7 @@ public class MainView extends JFrame {
 		        int index = sourceTabbedPane.getSelectedIndex();
 		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
-		        	allChannelPanel.removeAll();
+		        	//allChannelPanel.removeAll();
 		        }
 		        if(sourceTabbedPane.getTitleAt(index) == "Raw Data"){
 		        }
@@ -195,10 +248,7 @@ public class MainView extends JFrame {
 			}
 		});
 		
-		
-		
 
-		
 		//Tab Panel 2
 		
 		
@@ -299,13 +349,14 @@ public class MainView extends JFrame {
 		
 
 		/// TextLog
-
-		JScrollPane scrollpane = new JScrollPane(txtrEegDataLog);
-		scrollpane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		JPanel panelText = new JPanel();
-		panelText.setBackground(Color.WHITE);
+		panelText.setBackground(Color.WHITE);	
+		JScrollPane scrollpane = new JScrollPane(txtLog);
+		scrollpane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollpane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		panelText.add(scrollpane, BorderLayout.CENTER);
-		//txtrEegDataLog.setText("EEG Data Log.....\n");
+		//txtLog.append("TEST");
+		//txtLog.setText("EEG Data Log.....\n");
 		
 		
 		// Button Item
@@ -328,13 +379,6 @@ public class MainView extends JFrame {
 					int last = list.size() - 1;
 					if(list.get(last).equals("csv")){
 						String path = dialog.getDirectory() + dialog.getFile();
-//						EEG_Main.filepath = path;
-//						txtrEegDataLog.append(path + "\n");
-//						eegdata = new EEG_Data(dialog.getDirectory() + dialog.getFile());
-//						eeg_panel.set_data(eegdata.getDate_all());
-//						panel_3d.setdata();
-//						fft.fft_on();
-//						eeg_panel.set_on();
 						EEGData eegData = new EEGData(path);
 						String[][] eegRawData;
 						//tring emoPath="C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130816_175754_emostate.csv";
@@ -388,10 +432,7 @@ public class MainView extends JFrame {
 							fftPanel.add(fftChartPanel,BorderLayout.CENTER);
 							fftChartPanel.validate();
 							
-							
-							
-							
-							
+	
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -402,7 +443,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -420,9 +461,13 @@ public class MainView extends JFrame {
 
 		JButton btnLoad_1 = new JButton("");
 		btnLoad_1.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/heart.png")));
-		btnLoad_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
+		btnLoad_1.addMouseListener(new MouseAdapter(){
+		      public void mouseClicked(MouseEvent e){
+		    	 //TODO  http get request load heart data
+		    	 
+		    	  
+		      }
+			               
 		});
 		
 		JButton btnStart = new JButton("");
@@ -448,7 +493,7 @@ public class MainView extends JFrame {
 				List<Double> temp = new ArrayList<Double>();
 				List<List<Double>> testSet = new ArrayList<List<Double>>();
 				//read tranning data
-				EEGData angerData = new EEGData(angerPath);
+				EEGData angerData = new EEGData(excitePath);
 				String[][] angereeg = angerData.init();
 				angereeg=angerData.readData(angerData.init());
 				String[][] angerAdj=angerData.adjustData(angereeg, 128*3,0);
@@ -617,6 +662,7 @@ public class MainView extends JFrame {
 				correlResult.append("Peason's correlation coefficient :" + newline);
 				Correlation correlation = new Correlation();
 				// Normalize
+				//haha
 				paraX = correlation.Normalize(paraX, 1, -1);
 				paraY = correlation.Normalize(paraY, 1, -1);
 				int i=0;
@@ -628,7 +674,7 @@ public class MainView extends JFrame {
 				//Scale
 				paraY = correlation.Scale(paraY, paraX.length/paraY.length);
 				
-				ScatterPlot scatterPlot = new ScatterPlot(paraX, paraY, "Long Term Excitement", "Heart rate");
+				ScatterPlot scatterPlot = new ScatterPlot(paraX, paraY, "Short Term Excitement", "Heart Rate");
 				ChartPanel scatterChartPanel = new ChartPanel(scatterPlot.createChart());
 				scatterpanel.add(scatterChartPanel, BorderLayout.CENTER);
 				scatterChartPanel.validate();
@@ -665,8 +711,8 @@ public class MainView extends JFrame {
 							.addComponent(btnVideo, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
 							.addComponent(btnAnalysis, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE))
 						.addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE))
 					.addGap(12)
 					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 1047, Short.MAX_VALUE))
 		);
@@ -688,9 +734,9 @@ public class MainView extends JFrame {
 					.addGap(18)
 					.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
 					.addGap(27)
-					.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(89, Short.MAX_VALUE))
-				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
+					.addComponent(panelText, GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+					.addContainerGap())
+				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
 		);
 		
 		
@@ -717,10 +763,11 @@ public class MainView extends JFrame {
 						EMOData emoData = new EMOData(path);
 						String[][] emoRawData;
 						try{
+							//xixi
 							emoRawData = emoData.init();
 							emoRawData = emoData.readData(emoData.init());
 							String[][] adjEmoData = emoData.adjustData(emoRawData, 4*4, 4*4);
-							double[] shortExcit = emoData.getChannel(adjEmoData, 0);
+							double[] shortExcit = emoData.getChannel(adjEmoData, 1);
 							paraX = new double[shortExcit.length];
 							System.arraycopy(shortExcit, 0, paraX, 0, shortExcit.length);
 
@@ -733,7 +780,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -775,7 +822,8 @@ public class MainView extends JFrame {
 						try{
 							hrvRawData = hrvData.init();
 							hrvRawData=hrvData.readData(hrvData.init());
-							double[] hrRawData = hrvData.getChannel(hrvData.readData(hrvData.init()),1);
+							hrvRawData=hrvData.adjustData(hrvRawData, 4, 4);
+							double[] hrRawData = hrvData.getChannel(hrvRawData,1);
 							paraY = new double[hrRawData.length];
 							System.arraycopy(hrRawData, 0, paraY, 0, hrRawData.length);
 						}catch (Exception e1) {
@@ -787,7 +835,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -826,7 +874,8 @@ public class MainView extends JFrame {
 						try{
 							hrvRawData = hrvData.init();
 							hrvRawData=hrvData.readData(hrvData.init());
-							double[] hrRawData = hrvData.getChannel(hrvData.readData(hrvData.init()),2);
+							hrvRawData=hrvData.adjustData(hrvRawData, 4, 4);
+							double[] hrRawData = hrvData.getChannel(hrvRawData,2);
 							paraY = new double[hrRawData.length];
 							System.arraycopy(hrRawData, 0, paraY, 0, hrRawData.length);
 						}catch (Exception e1) {
@@ -838,7 +887,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtrEegDataLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);

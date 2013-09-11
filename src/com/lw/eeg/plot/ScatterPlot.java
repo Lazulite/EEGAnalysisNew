@@ -51,7 +51,7 @@ public class ScatterPlot {
     private static XYDataset samplexydataset2() {
 
         XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
-        XYSeries series = new XYSeries("Random");
+        XYSeries series = new XYSeries("");
         for(int i=0; i<paraX.length;i++){
         	series.add(paraX[i],paraY[i]);
         }

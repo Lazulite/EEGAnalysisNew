@@ -12,5 +12,13 @@
 	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/jna-3.5.2.jar"/>
 	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/platform-3.5.2.jar"/>
 	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/vlcj-2.4.1.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/httpclient-4.2.5.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/httpclient-cache-4.2.5.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/httpcore-4.2.4.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/org.json-20120521.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="E:/workspace/android/MSCPROJECT/EEGAnalysis/jars/fluent-hc-4.2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
