@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -27,7 +29,13 @@ import org.jfree.data.time.Second;
 import org.jfree.data.xy.XYDataset;
 import org.junit.runner.notification.StoppedByUserException;
 
+import com.lw.eeg.jsonlib.*;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.lw.eeg.Main.wikiHttp;
 import com.lw.eeg.data.CSVHelper;
 import com.sun.jna.Pointer;
@@ -46,8 +54,11 @@ public class EEGLog {
 	public List<List<String>> raweeg;
 	public List<List<String>> rawestate;
 	public wikiHttp wikiHelper;
-	
-	public EEGLog(){
+	private String mtoken;
+	private String rootURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/";
+	private List<String> unitids = new ArrayList();
+	public EEGLog(String m){
+		mtoken = m;
 		eeg = new Thread_EEG();
 		plot = new Thread_Plot();
 		raweeg = new ArrayList<List<String>>();
@@ -108,7 +119,44 @@ class Thread_EEG extends Thread{
 		csvHelper1.createFile_rawData();
 		csvHelper2.setFilename(csvHelper2.getSimpleTime(time) + "_emostate.csv");
 		csvHelper2.createFile_emoState();
+		final String[] channel= new String[]{"AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"};
 		
+		
+		Gson gson = new Gson();
+		NewDatastream newDatastream = new NewDatastream("eeg");
+		for(int i=0; i<14; i++){
+			Unit newUnit = new Unit();
+			newUnit.setLabel(channel[i]);
+			newUnit.setValueType("double");							
+			newDatastream.addUnit(newUnit);
+		}
+		
+		String newDT= gson.toJson(newDatastream);
+		//mtoken = URLEncoder.encode(mtoken).replace("\"", "");
+		
+		String dtURL = rootURL+"health/title?accesstoken="+mtoken+"&api_key=special-key";  
+		wikiHttp wiki=new wikiHttp( dtURL, "POST", newDT, null);
+		InputStream result;
+		result = wiki.doInBackground();
+
+		JsonReader reader = new JsonReader(new InputStreamReader(result));
+		reader.setLenient(true);
+		JsonParser parser = new JsonParser();
+		System.err.println("RESPONSE"+"before parsing json ");					
+	    JsonObject obj = parser.parse(reader).getAsJsonObject();	
+	    System.err.println("RESPONSE"+"Before obj.toString()");
+	    System.err.println("RESPONSE"+obj.toString());
+
+	    JsonObject dtresponse = obj.get("datastream").getAsJsonObject();
+	    JsonArray unitList = dtresponse.get("units_list").getAsJsonArray(); 
+	    for(int i = 0; i<unitList.size(); i++){
+		    JsonObject unitLabel = unitList.get(i).getAsJsonObject();
+		    String unit_id = unitLabel.get("unit_id").getAsString();
+		    System.err.println("Unit label is "+unit_id);
+		    unitids.add(unit_id);
+			//response.append("Unit Label: " + unit_id + newline);
+	    }
+
     	switch (option) {
 		case 1:
 		{
@@ -204,6 +252,30 @@ class Thread_EEG extends Thread{
 								}else if(i>2 && i<17){
 									csvHelper1.writeCSV( element+",");
 									innereeg.add(element);
+									for(int d=0; d<unitids.size();i++){
+										Gson gsonhlp = new Gson();
+										Value v;
+										v = new Value(unitids.get(i), (double)Double.parseDouble(element), "string");
+										Datapoints newdp= new Datapoints(Long.valueOf(timestamp), "string");
+										newdp.addValueList(v);
+										Datapoint newDatapoint = new Datapoint();
+										newDatapoint.adddp(newdp);
+										
+										String newDP= gson.toJson(newDatapoint);
+										String hrURL = rootURL+"health/title/"+"eeg/datapoints?accesstoken="+mtoken+"&api_key=special-key"; 
+										wikiHttp wikihlp=new wikiHttp( hrURL, "POST", newDP, null);
+
+										InputStream newresult = wiki.doInBackground();
+					
+										JsonReader newreader = new JsonReader(new InputStreamReader(newresult));
+										reader.setLenient(true);
+										JsonParser newparser = new JsonParser();
+										System.err.println("RESPONSE"+"before parsing json ");					
+									    JsonObject newobj = parser.parse(reader).getAsJsonObject();	
+									    System.err.println("RESPONSE"+"Before obj.toString()");
+									    System.err.println("RESPONSE"+newobj.toString());
+									    System.err.println("RESPONSE"+newobj.get("result"));
+				                	}
 								}else if(i>16 && i<21){
 									csvHelper1.writeCSV( element+",");
 								}else if(i==22){

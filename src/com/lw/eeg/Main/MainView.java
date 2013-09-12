@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -35,6 +36,7 @@ import weka.core.Instances;
 import weka.core.Utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
@@ -59,8 +61,7 @@ public class MainView extends JFrame {
 	private EEGLog eegLogger;
 	private wikiHttp wikiHelper;
 	private String excitePath;
-	private String sleepyPath;
-	private String stressPath;
+	private String relaxPath;
 	private String testPath;
 	
 	private double[] paraX;
@@ -75,16 +76,18 @@ public class MainView extends JFrame {
     private String mBlockid=null;
     private String rootURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/";
     private List<String> unitids =new ArrayList<String>();
-	
+    private List<String> unitLabels = new ArrayList<String>();
+	private Boolean stopflag=false;
+    
+    
 	public MainView() throws Exception {
 		setPanel();
 		txtLog = new JTextArea();
-		//angerPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
-		//sleepyPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
+		//excitePath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
+		//relaxPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
 		//testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
 
 		excitePath = System.getProperty("user.dir") + "\\data\\cs2m\\20130902_225704_rawdata.csv";
-		stressPath = null;
 		
 		
 	}
@@ -121,17 +124,14 @@ public class MainView extends JFrame {
 				Loginid loginid = new Loginid("lei", "northern", 99999);
 				String login = toJ.toJson(loginid);
 
-				String logURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/users/gettoken?api_key=special-key";
+				String logURL=rootURL+"users/gettoken?api_key=special-key";
 //				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
 //				nameValuePairs.add(new BasicNameValuePair("accesstoken", "b323b8a8ff6448128c7da7c7d21be233"));  
 //				nameValuePairs.add(new BasicNameValuePair("api_key", "special-key")); 
-				String unitURL="http://wikihealth.bigdatapro.org:55555/healthbook/v1/health/title/heart_rate/unit?accesstoken=b323b8a8ff6448128c7da7c7d21be233&api_key=special-key";
 				
 				wikiHelper=new wikiHttp( logURL, "POST", login, null);
-				InputStream result;
-				result = wikiHelper.doInBackground();
+				InputStream result = wikiHelper.doInBackground();
 				
-				Gson gson=new Gson();
 				JsonReader reader = new JsonReader(new InputStreamReader(result));
 				reader.setLenient(true);
 				JsonParser parser = new JsonParser();
@@ -432,6 +432,7 @@ public class MainView extends JFrame {
 							fftPanel.add(fftChartPanel,BorderLayout.CENTER);
 							fftChartPanel.validate();
 							
+
 	
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
@@ -464,7 +465,55 @@ public class MainView extends JFrame {
 		btnLoad_1.addMouseListener(new MouseAdapter(){
 		      public void mouseClicked(MouseEvent e){
 		    	 //TODO  http get request load heart data
-		    	 
+		    	 if(mtoken!=null){
+		    		 
+		    		 List<String> hrList = new ArrayList<String>();
+		    		 CSVHelper csvHelper = new CSVHelper();
+		    			
+		    		 Date time = new Date();
+		    		 csvHelper.setFilename(csvHelper.getSimpleTime(time) + "_hrdata.csv");
+		    		 csvHelper.createFile_hrData();
+		    		 String hrURL = "http://wikihealth.bigdatapro.org:55555/healthbook/v1/health/title/heart_data/datapoints?accesstoken=3cabd0740e2b4fcba68f50c082cd8661&api_key=special-key";
+		    		 //String hrURL = rootURL+"health/title/heart_data/datapoints?accesstoken="+mtoken+"&api_key=special-key";
+		    		 wikiHttp newwiki = new wikiHttp(hrURL, "GET", null, null);
+		    		 InputStream result = newwiki.doInBackground();
+		    		 
+		    		 JsonReader reader = new JsonReader(new InputStreamReader(result));
+		    		 reader.setLenient(true);
+		    		 JsonParser parser = new JsonParser();
+		    		 //Log.e("RESPONSE", "before parsing json ");					
+		    		 JsonObject newobj = parser.parse(reader).getAsJsonObject();	
+		    		 //Log.e("RESPONSE", "Before obj.toString()");
+		    		 System.err.println("HRRESPONSE "+newobj.toString());
+
+		    		 JsonObject dpobj = newobj.get("datapoints_list").getAsJsonObject();
+		    		 JsonArray dpList = dpobj.get("data_points").getAsJsonArray();
+		    		 System.err.println("dataPoints"+dpList.toString());
+		    		 for(int i = 0; i<dpList.size(); i++){
+		    			 	csvHelper.writeCSV("timestamp,");
+		    			    JsonObject dps = dpList.get(i).getAsJsonObject();
+		    			    System.err.println("EachdataPoints "+i+"=>"+dpList.toString());
+		    			    
+		    			    String fromstart = dps.get("at").getAsString();
+		    			    System.err.println("EachdataPoints "+i+"at=>"+fromstart);
+		    			    JsonArray valueList = dps.get("value_list").getAsJsonArray();
+		    			   
+		    			    JsonObject hrObj = valueList.get(1).getAsJsonObject();
+		    			    String hr=hrObj.get("val").getAsString();
+		    			    csvHelper.writeCSV(hr+",");
+		    			    
+		    			    JsonObject hrvObj = valueList.get(0).getAsJsonObject();
+		    			    String hrv = hrvObj.get("val").getAsString(); 
+		    			    csvHelper.writeCSV(hrv+",");
+		    			    csvHelper.writeCSV(fromstart+"\n");
+		    		 }
+		    		 //get datapoints from 0, a pair each time
+		    		 // if total_points equal 1
+		    		 //while(true){}
+		    		 //while(total_points equal<=1){if flag = true, break}
+		    		 //if flag break//
+		    		 //
+		    	 }
 		    	  
 		      }
 			               
@@ -474,7 +523,7 @@ public class MainView extends JFrame {
 		btnStart.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/playback_play.png")));
 		btnStart.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
-				eegLogger  = new EEGLog();
+				eegLogger  = new EEGLog(mtoken);
 				eegLogger.startRecord();
 				ChartPanel allChannelp = new ChartPanel(eegLogger.getRealtimeChart());
 				allChannelPanel.add(allChannelp, BorderLayout.CENTER);
@@ -487,6 +536,38 @@ public class MainView extends JFrame {
 		btnAnalysis.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e){
 				
+//				System.out.println("Load Data");
+//				FileDialog dialog = new FileDialog(frame);
+//				dialog.setSize(300, 200);
+//				dialog.setVisible(true);
+//				
+//				if(dialog.getDirectory() != null){
+//					StringTokenizer str = new StringTokenizer(dialog.getFile(), ".");
+//					ArrayList<String> list = new ArrayList<String>();
+//					while(str.hasMoreTokens()){
+//						list.add(str.nextToken());
+//					}
+//					int last = list.size() - 1;
+//					if(list.get(last).equals("csv")){
+//						
+//					}else{
+//						final Dialog dialog_confirm = new Dialog(frame, "Confirm");
+//						dialog_confirm.setLayout(new BorderLayout(0, 0));
+//						dialog_confirm.setBackground(Color.WHITE);
+//						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
+//						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
+//						dialog_confirm.setSize(400, 100);
+//						dialog_confirm.setLocation(100, 100);
+//						dialog_confirm.setVisible(true);
+//						dialog_confirm.addWindowListener(new WindowAdapter() {
+//							public void windowClosing(WindowEvent e){
+//								dialog_confirm.dispose();
+//							}
+//						});
+//					}
+//				}
+//				
+				// analysis loading data from eeg and heart data csv 
 				try{
 					
 				List<List<Double>> trainSet = new ArrayList<List<Double>>();
@@ -649,7 +730,7 @@ public class MainView extends JFrame {
 		btnStop.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
 				eegLogger.stopRecord();
-				
+				stopflag=true;
 			}
 		});
 		

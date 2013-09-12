@@ -31,6 +31,7 @@ public class wikiHttp {
         method=_method;
         jobj = _jobj;
         paras=_paras;
+        System.err.println("HERE" + method);
     }
     public InputStream doInBackground() {
 
@@ -56,9 +57,10 @@ public class wikiHttp {
         		HttpResponse response = (HttpResponse) httpclient.execute(httpPostRequest);
         		is = response.getEntity().getContent();
 
-        	}else if(method == "GET"){
+        	}else if(method.equals("GET")){
             // request method is GET
-	            DefaultHttpClient httpClient = new DefaultHttpClient();
+        		System.err.println("In GET()");
+	            HttpClient httpClient = new DefaultHttpClient();
 	            if(paras!=null)
 	            {	String paramString = URLEncodedUtils.format(paras, "utf-8");
 	            	URL += "?" + paramString;

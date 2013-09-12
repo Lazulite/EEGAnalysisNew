@@ -43,6 +43,16 @@ public class CSVHelper {
 		return null;
 	}
 	
+	public FileWriter createFile_hrData(){
+		try {
+			fileWriter = new FileWriter("C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\test\\"+fileName);
+			fileWriter.write("Timestamp,HR,HRV,FromStart\n"); 
+			return fileWriter;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	
 	public void writeCSV(String data) {
