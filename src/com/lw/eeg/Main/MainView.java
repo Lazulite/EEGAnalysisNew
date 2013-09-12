@@ -365,6 +365,7 @@ public class MainView extends JFrame {
 		btnLoad.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/brainstorming.png")));
 		btnLoad.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
+				allChannelPanel.removeAll();
 				System.out.println("Load Data");
 				FileDialog dialog = new FileDialog(frame);
 				dialog.setSize(300, 200);
@@ -401,6 +402,9 @@ public class MainView extends JFrame {
 							FeaturesCalc fCalc = new FeaturesCalc();
 							fCalc.calc(adjeegdata);
 							double[] fft =fCalc.getFFTResult();
+//							for(double f:fft){
+//								System.err.println("###  " + f);
+//							}
 							double[][] avgFeatureAF3 = fCalc.getAvgFeatures(); // get all features of every 5 second
 							double[] featurebuffer = new double[4];
 							//System.err.println(avgFeatureAF3[0][0] +" length :"+ avgFeatureAF3.length);
@@ -422,8 +426,14 @@ public class MainView extends JFrame {
 							channelButtons.setData(adjeegdata);
 							if(channelButtons.click){
 								ChartPanel singleChannelp = new ChartPanel(channelButtons.getChart());
+								if(channelButtons.getChart()==null)
+									System.err.println("Single channel chart is null");
 								singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
 								singleChannelp.validate();
+							}
+							
+							for(double f:fft){
+								System.err.println("###  " + f);
 							}
 							
 							SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
@@ -465,11 +475,14 @@ public class MainView extends JFrame {
 		btnLoad_1.addMouseListener(new MouseAdapter(){
 		      public void mouseClicked(MouseEvent e){
 		    	 //TODO  http get request load heart data
+		    	  
+		    	 singleChannelPanel.removeAll();
 		    	 if(mtoken!=null){
 		    		 
 		    		 List<String> hrList = new ArrayList<String>();
 		    		 CSVHelper csvHelper = new CSVHelper();
-		    			
+		    		 List<String> hrvList = new ArrayList<String>();
+		    		 
 		    		 Date time = new Date();
 		    		 csvHelper.setFilename(csvHelper.getSimpleTime(time) + "_hrdata.csv");
 		    		 csvHelper.createFile_hrData();
@@ -501,12 +514,16 @@ public class MainView extends JFrame {
 		    			    JsonObject hrObj = valueList.get(1).getAsJsonObject();
 		    			    String hr=hrObj.get("val").getAsString();
 		    			    csvHelper.writeCSV(hr+",");
-		    			    
+		    			    hrList.add(hr);
 		    			    JsonObject hrvObj = valueList.get(0).getAsJsonObject();
 		    			    String hrv = hrvObj.get("val").getAsString(); 
 		    			    csvHelper.writeCSV(hrv+",");
+		    			    hrvList.add(hrv);
 		    			    csvHelper.writeCSV(fromstart+"\n");
 		    		 }
+		    		 
+		    		 //plot
+		    		 
 		    		 //get datapoints from 0, a pair each time
 		    		 // if total_points equal 1
 		    		 //while(true){}

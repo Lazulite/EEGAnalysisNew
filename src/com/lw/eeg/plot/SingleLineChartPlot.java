@@ -31,8 +31,10 @@ public class SingleLineChartPlot {
 
 	public void setData(double[]  _data){
 		System.out.println("SingleLineChartPlot.setData()");
+		for(double d: _data)
+			System.out.println(d);
 		data = new double[_data.length];
-		System.arraycopy(data, 0, _data, 0, _data.length);
+		System.arraycopy(_data, 0, data, 0, _data.length);
 		for(double d: data)
 			System.out.println(d);
 		XYSeriesCollection seriesCollection = createSeries();

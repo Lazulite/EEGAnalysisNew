@@ -65,10 +65,11 @@ public class FeaturesCalc {
 					double[] fftbuf= feature.getFFTresult();
 			        feature.calcEEGFeature();
 			        double[] features=feature.getFeature();
-			        fftresult = new double[fftbuf.length];
+			        
 			        if(ch==1 && index>1000 &&flag){
 			        	//System.out.println("FeaturesCalc.calc() if{}");
 			        	flag=false;
+			        	fftresult = new double[fftbuf.length];
 			        	System.arraycopy(fftbuf, 0, fftresult, 0, fftbuf.length);
 			        	for(double d: fftresult){
 			    		System.out.println(d);
