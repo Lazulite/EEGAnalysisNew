@@ -19,7 +19,6 @@ import org.jfree.data.xy.XYDataset;
 
 public class SingleChannelPlot {
 
-    private static final float MINMAX = 100;
     private static final int COUNT = 2 * 200;
     private static final int FAST = 100;
     private static final int SLOW = FAST * 5;
@@ -68,7 +67,7 @@ public class SingleChannelPlot {
     
     private double getNext() {
     	i++;
-    	System.err.println("getNext " + channel[i]);
+    	//System.err.println("getNext " + channel[i]);
         return channel[i];  
     }
 
@@ -77,11 +76,14 @@ public class SingleChannelPlot {
             "", "", "", dataset, true, true, false);
         final XYPlot plot = result.getXYPlot();
         plot.getRenderer().setSeriesVisibleInLegend(false);
-        plot.setBackgroundPaint(Color.black);
+        plot.setBackgroundPaint(Color.white);
+        plot.setDomainGridlinePaint(Color.black);
+        plot.setRangeGridlinePaint(Color.black);
         ValueAxis domain = plot.getDomainAxis();
         domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
-        range.setRange(-MINMAX, MINMAX);
+        //range.setRange(4000, 4500);
+        range.setAutoRange(true);
         return result;
     }
 

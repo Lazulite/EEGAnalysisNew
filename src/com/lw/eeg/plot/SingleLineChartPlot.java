@@ -31,17 +31,18 @@ public class SingleLineChartPlot {
 
 	public void setData(double[]  _data){
 		System.out.println("SingleLineChartPlot.setData()");
-		for(double d: _data)
-			System.out.println(d);
+
 		data = new double[_data.length];
 		System.arraycopy(_data, 0, data, 0, _data.length);
-		for(double d: data)
-			System.out.println(d);
+//		for(double d: data)
+//			System.out.println(d);
 		XYSeriesCollection seriesCollection = createSeries();
 		JFreeChart mChart = creatChart(seriesCollection);	
-//		ChartPanel fftp = new ChartPanel(mChart);
-//		fftJPanel.add(fftp, BorderLayout.CENTER);
-//		fftp.validate();
+		fftJPanel.getSize();
+		ChartPanel fftp = new ChartPanel(mChart);
+		fftp.setSize(fftJPanel.getSize());
+		fftJPanel.add(fftp, BorderLayout.CENTER);
+		fftp.validate();
 	}
 
 	public void setPanel(JPanel _fftJPanel){
@@ -64,6 +65,9 @@ public class SingleLineChartPlot {
         plot.setBackgroundPaint(Color.white);
         plot.setDomainGridlinePaint(Color.black);
         plot.setRangeGridlinePaint(Color.black);
+        plot.getDomainAxis().setAutoRange(true);
+        plot.getRangeAxis().setAutoRange(true);
+        
         System.out.println("SingleLineChartPlot.creatChart()");
         return chart;
 

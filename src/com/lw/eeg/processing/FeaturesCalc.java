@@ -72,7 +72,7 @@ public class FeaturesCalc {
 			        	fftresult = new double[fftbuf.length];
 			        	System.arraycopy(fftbuf, 0, fftresult, 0, fftbuf.length);
 			        	for(double d: fftresult){
-			    		System.out.println(d);
+			        		System.out.println(d);
 			        	}
 			        }
 			        for(int f=0; f<4;f++){
@@ -88,7 +88,7 @@ public class FeaturesCalc {
 						if(ch==1){
 							System.arraycopy(featuresbuf, 0, avgFeatureAF3[fftnum], 0, 4);
 						}
-//						fftnum++;
+						fftnum++;
 					}
 					count++;
 					index+=128;

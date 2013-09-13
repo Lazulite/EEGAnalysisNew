@@ -18,6 +18,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.Dataset;
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.general.DatasetChangeListener;
+import org.jfree.data.resources.DataPackageResources;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
@@ -27,14 +28,19 @@ import com.lw.eeg.data.Data;
 public  class BarChart3DPlot implements DatasetChangeListener {
 	private JFreeChart chart;
 	private DefaultCategoryDataset dataset;
-	
+	private double[] data;
 	
     public BarChart3DPlot() {
-        final CategoryDataset dataset = createDataset();
+       
+    }
+    public void setData(double[] _data){
+    	data = new double[_data.length];
+    	System.arraycopy(_data, 0, data, 0, _data.length);
+    	CategoryDataset dataset = createDataset();
         JFreeChart chart = createChart(dataset);
     }
 
-    
+
     public void updateDataset(double[] data){
 	    
 		dataset.setValue(data[0], dataset.getRowKey(0), dataset.getColumnKey(0));
@@ -50,12 +56,14 @@ public  class BarChart3DPlot implements DatasetChangeListener {
     }
     
     private CategoryDataset createDataset() {
-
+//    	for(double d:data){
+//    		System.err.println("HERE!!!!!!" +d);
+//    	}
         dataset = new DefaultCategoryDataset();
-        dataset.addValue(0.00, "1", "Delta");
-        dataset.addValue(0.00, "2", "Theta");
-        dataset.addValue(0.00, "3", "Alpha");
-        dataset.addValue(0.00, "4", "Beta");
+        dataset.addValue(data[0], "1", "Delta");
+        dataset.addValue(data[1], "2", "Theta");
+        dataset.addValue(data[2], "3", "Alpha");
+        dataset.addValue(data[3], "4", "Beta");
         //dataset.addChangeListener(this); 
         return dataset;
     }

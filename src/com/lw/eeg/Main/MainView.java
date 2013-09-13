@@ -228,13 +228,6 @@ public class MainView extends JFrame {
 		singleChannelPanel.setLayout(new BorderLayout(0, 0));
 		
 		channelButtons = new ChannelButtons(tabPanel);
-		/*channelButtons.setData(adjeegdata);
-		
-		ChartPanel p = new ChartPanel(channelButtons.getChart());
-		singleChannelPanel.add(p, BorderLayout.CENTER);
-		p.validate();*/
-		
-		
 		
 		JCheckBox chckbxALL = new JCheckBox("All");
 		chckbxALL.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -261,48 +254,16 @@ public class MainView extends JFrame {
 		
 		featurePanel = new JPanel();
 		featurePanel.setBackground(new Color(255, 255, 255));
-		featurePanel.setBounds(290, 10, 743, 441);
+		featurePanel.setBounds(290, 10, 743, 404);
 		tabPanel_1.add(featurePanel);
 		
 		fftPanel = new JPanel();
-		fftPanel.setBounds(290, 452, 743, 245);
+		fftPanel.setBounds(290, 418, 743, 245);
 		tabPanel_1.add(fftPanel);
 		
 		ChannelButtonsFFT channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);
-		
-		JCheckBox checkBox = new JCheckBox("Hanning");
-		checkBox.setBackground(Color.WHITE);
-		checkBox.setBounds(65, 558, 74, 23);
-		tabPanel_1.add(checkBox);
-		checkBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JCheckBox checkBox_1 = new JCheckBox("Hamming");
-		checkBox_1.setBackground(Color.WHITE);
-		checkBox_1.setBounds(65, 521, 74, 23);
-		tabPanel_1.add(checkBox_1);
-		checkBox_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JCheckBox checkBox_2 = new JCheckBox("Blackman");
-		checkBox_2.setBackground(Color.WHITE);
-		checkBox_2.setBounds(65, 478, 74, 23);
-		tabPanel_1.add(checkBox_2);
-		checkBox_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		
-		JCheckBox checkBox_3 = new JCheckBox("Rectangular");
-		checkBox_3.setBackground(Color.WHITE);
-		checkBox_3.setBounds(65, 598, 109, 23);
-		tabPanel_1.add(checkBox_3);
-		
+		channelButtonsFFT.setEnable();
+//		
 		
 		// Tab panel3
 		JPanel tabPanel_2 = new JPanel();
@@ -339,7 +300,7 @@ public class MainView extends JFrame {
 		
 		final JPanel scatterpanel = new JPanel();
 		scatterpanel.setBackground(Color.WHITE);
-		scatterpanel.setBounds(332, 25, 779, 473);
+		scatterpanel.setBounds(332, 25, 779, 429);
 		tabPanel_3.add(scatterpanel);
 		
 
@@ -406,24 +367,45 @@ public class MainView extends JFrame {
 //								System.err.println("###  " + f);
 //							}
 							double[][] avgFeatureAF3 = fCalc.getAvgFeatures(); // get all features of every 5 second
-							double[] featurebuffer = new double[4];
+							//double[] featurebuffer = new double[4];
 							//System.err.println(avgFeatureAF3[0][0] +" length :"+ avgFeatureAF3.length);
 							
 							//System.err.println("After fCals, before plot");
-							BarChart3DPlot featurePlot = new BarChart3DPlot();
-							ChartPanel featurep = new ChartPanel(featurePlot.getChart());
-							featurePanel.add(featurep, BorderLayout.CENTER);
-							featurep.validate();
-							
+//							BarChart3DPlot featurePlot = new BarChart3DPlot();
+//							ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+//							featurePanel.add(featurep, BorderLayout.CENTER);
+//							featurep.validate();
+//							
+//							for(int f=0; f<avgFeatureAF3.length; f++){
+//								//featurePanel.removeAll();
+//								System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
+//								featurePlot.updateDataset(featurebuffer);
+//							}
+//							
+							//TODO time control update 0.5s
 							for(int f=0; f<avgFeatureAF3.length; f++){
-								//featurePanel.removeAll();
+								//System.err.println("BARCHART" + f);
+								featurePanel.removeAll();
+								double[] featurebuffer = new double[4];
 								System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
-								featurePlot.updateDataset(featurebuffer);
+//								for(double d:avgFeatureAF3[f])
+//									System.err.println("before setdata af3 " + d);
+//								for(double d:featurebuffer)
+//									System.err.println("before setdata " + d);	
+								BarChart3DPlot featurePlot = new BarChart3DPlot();
+								featurePlot.setData(featurebuffer);
+								ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+								featurePanel.add(featurep, BorderLayout.CENTER);
+								featurep.validate();
+								featurep.repaint();
 							}
 							
-							//fCalc.getFFTResult();
+							
+							
+							//Single Channel details
 							channelButtons.setEnable();
 							channelButtons.setData(adjeegdata);
+							channelButtons.setPanel(singleChannelPanel);
 							if(channelButtons.click){
 								ChartPanel singleChannelp = new ChartPanel(channelButtons.getChart());
 								if(channelButtons.getChart()==null)
@@ -432,15 +414,15 @@ public class MainView extends JFrame {
 								singleChannelp.validate();
 							}
 							
-							for(double f:fft){
-								System.err.println("###  " + f);
-							}
 							
 							SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
+							singleLineChartPlot.setPanel(fftPanel);
 							singleLineChartPlot.setData(fft);
-							ChartPanel fftChartPanel = new ChartPanel(singleLineChartPlot.getChart());
-							fftPanel.add(fftChartPanel,BorderLayout.CENTER);
-							fftChartPanel.validate();
+							//singleLineChartPlot.setPanel(fftPanel);
+							//fftPanel.setLayout(new java.awt.BorderLayout());
+//							ChartPanel fftChartPanel = new ChartPanel(singleLineChartPlot.getChart());
+//							fftPanel.add(fftChartPanel,BorderLayout.CENTER);
+//							fftChartPanel.validate();
 							
 
 	
