@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.jfree.data.resources.DataPackageResources;
@@ -80,6 +81,13 @@ public class Data {
 		
 		
 		return null;
+	}
+	
+	public double[] convertTodouble(List<String> data){
+		double[] result = new double[data.size()];
+		for(int d=0; d<data.size(); d++)
+			result[d]=Double.parseDouble(data.get(d));	
+		return result;
 	}
 
 }

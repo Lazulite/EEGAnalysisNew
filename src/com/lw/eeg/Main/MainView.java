@@ -23,6 +23,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.TabableView;
 
 import org.jfree.chart.ChartPanel;
@@ -39,6 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.internal.bind.JsonTreeReader;
 import com.google.gson.stream.JsonReader;
 import com.lw.eeg.data.*;
 import com.lw.eeg.EEGLog.*;
@@ -50,7 +52,6 @@ public class MainView extends JFrame {
 	
 	private static JPanel contentPane;
 	private static JFrame frame;
-	private static JTextArea txtLog; 
 	private static JPanel allChannelPanel; // AllChannel panel
 	private static JPanel singleChannelPanel; // Singchannel panel
 	private static JPanel featurePanel; // Feature Panel
@@ -82,8 +83,11 @@ public class MainView extends JFrame {
     
 	public MainView() throws Exception {
 		setPanel();
-		txtLog = new JTextArea();
-		//excitePath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
+//		txtlogger = new JTextArea();
+//		txtlogger.setText("Begin");
+		
+		//txtlogger.setText("Welcome!");
+				//excitePath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
 		//relaxPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
 		//testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
 
@@ -181,7 +185,18 @@ public class MainView extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
+		JPanel logPanel = new JPanel();
+		logPanel.setLayout(new BorderLayout());
+		JTextArea txtlogger = new JTextArea();
+		DefaultCaret caret = (DefaultCaret)txtlogger.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		txtlogger.setFont(new Font("Nyala", Font.PLAIN, 14));
+		JScrollPane logScrollPane = new JScrollPane(txtlogger);
+		logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		
+		logPanel.add(logScrollPane);
+		
+
 		//Tab Panel Init
 		// Tab Panel
 
@@ -233,7 +248,7 @@ public class MainView extends JFrame {
 		chckbxALL.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		chckbxALL.setSelected(true);
 		chckbxALL.setBackground(Color.WHITE);
-		chckbxALL.setBounds(6, 514, 51, 23);
+		chckbxALL.setBounds(6, 477, 51, 23);
 		tabPanel.add(chckbxALL);
 		tabPanel.validate();
 		chckbxALL.addActionListener(new ActionListener() {
@@ -307,17 +322,8 @@ public class MainView extends JFrame {
 		final JTextArea correlResult = new JTextArea();
 		correlResult.setBounds(332, 508, 710, 84);
 		tabPanel_3.add(correlResult);
-		
-
-		/// TextLog
-		JPanel panelText = new JPanel();
-		panelText.setBackground(Color.WHITE);	
-		JScrollPane scrollpane = new JScrollPane(txtLog);
-		scrollpane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollpane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		panelText.add(scrollpane, BorderLayout.CENTER);
-		//txtLog.append("TEST");
-		//txtLog.setText("EEG Data Log.....\n");
+		//txtlogger.append("TEST");
+		//txtlogger.setText("EEG Data Log.....\n");
 		
 		
 		// Button Item
@@ -406,13 +412,11 @@ public class MainView extends JFrame {
 							channelButtons.setEnable();
 							channelButtons.setData(adjeegdata);
 							channelButtons.setPanel(singleChannelPanel);
-							if(channelButtons.click){
-								ChartPanel singleChannelp = new ChartPanel(channelButtons.getChart());
-								if(channelButtons.getChart()==null)
-									System.err.println("Single channel chart is null");
-								singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
-								singleChannelp.validate();
-							}
+//							if(channelButtons.click){
+//								ChartPanel singleChannelp = new ChartPanel(channelButtons.getChart());
+//								singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
+//								singleChannelp.validate();
+//							}
 							
 							
 							SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
@@ -436,7 +440,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -457,7 +461,8 @@ public class MainView extends JFrame {
 		btnLoad_1.addMouseListener(new MouseAdapter(){
 		      public void mouseClicked(MouseEvent e){
 		    	 //TODO  http get request load heart data
-		    	  
+		    	 channelButtons.setHRenable();
+		    	 
 		    	 singleChannelPanel.removeAll();
 		    	 if(mtoken!=null){
 		    		 
@@ -504,6 +509,13 @@ public class MainView extends JFrame {
 		    			    csvHelper.writeCSV(fromstart+"\n");
 		    		 }
 		    		 
+		    		 
+		    		 channelButtons.setHRData(hrList);
+		    		 channelButtons.setHRVData(hrvList);
+		    		 System.out
+							.println("MainView.setPanel().new MouseAdapter() {...}.mouseClicked()");
+		    		 System.err.println("hr"+hrList.get(0));
+		    		 System.err.println("hrv"+hrvList.get(0) + hrvList.size());
 		    		 //plot
 		    		 
 		    		 //get datapoints from 0, a pair each time
@@ -554,7 +566,7 @@ public class MainView extends JFrame {
 //						dialog_confirm.setLayout(new BorderLayout(0, 0));
 //						dialog_confirm.setBackground(Color.WHITE);
 //						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-//						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
+//						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 //						dialog_confirm.setSize(400, 100);
 //						dialog_confirm.setLocation(100, 100);
 //						dialog_confirm.setVisible(true);
@@ -767,9 +779,6 @@ public class MainView extends JFrame {
 			}
 		});
 		
-
-		
-		
 		
 		
 		
@@ -781,20 +790,21 @@ public class MainView extends JFrame {
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(btnLoad_1, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
-							.addComponent(btnLoad, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
-							.addComponent(btnStart, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(btnVideo, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
-							.addComponent(btnAnalysis, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE))
-						.addComponent(btnStop, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panelText, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE))
-					.addGap(12)
-					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 1047, Short.MAX_VALUE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(btnCapture, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(btnLoad_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+								.addComponent(btnLoad, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+								.addComponent(btnStart, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(btnVideo, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+								.addComponent(btnAnalysis, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+								.addComponent(btnStop, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)))
+						.addComponent(logPanel, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 1209, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -813,11 +823,13 @@ public class MainView extends JFrame {
 					.addComponent(btnVideo)
 					.addGap(18)
 					.addComponent(btnCapture, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-					.addGap(27)
-					.addComponent(panelText, GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-					.addContainerGap())
-				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+					.addGap(18)
+					.addComponent(logPanel, GroupLayout.PREFERRED_SIZE, 260, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE)
 		);
+		
+		
 		
 		
 		
@@ -860,7 +872,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -915,7 +927,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -967,7 +979,7 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtLog.append("Check your File, Please Select \".csv\" File!!\n");
+						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);

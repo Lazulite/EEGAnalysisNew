@@ -71,9 +71,9 @@ public class FeaturesCalc {
 			        	flag=false;
 			        	fftresult = new double[fftbuf.length];
 			        	System.arraycopy(fftbuf, 0, fftresult, 0, fftbuf.length);
-			        	for(double d: fftresult){
-			        		System.out.println(d);
-			        	}
+//			        	for(double d: fftresult){
+//			        		System.out.println(d);
+//			        	}
 			        }
 			        for(int f=0; f<4;f++){
 			        	featuresbuf[f]+=features[f];

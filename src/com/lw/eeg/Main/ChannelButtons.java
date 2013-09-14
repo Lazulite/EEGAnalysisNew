@@ -6,7 +6,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
@@ -15,6 +17,7 @@ import javax.swing.JRadioButton;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
+import com.lw.eeg.data.Data;
 import com.lw.eeg.data.EEGData;
 import com.lw.eeg.plot.SingleChannelPlot;
 
@@ -22,10 +25,14 @@ public class ChannelButtons implements ActionListener {
 	
 	private String[][] totalData;
 	private String[] chName= new String[]{"AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"};
-	private SingleChannelPlot singleChannelPlot;
+	//private SingleChannelPlot singleChannelPlot;
 	private EEGData eegHelper = new EEGData();
 	public boolean click = false;
 	private JPanel singleJPanel;
+	private boolean occupied=false;
+	
+	private List<String> hrData = new ArrayList<String>();
+	private List<String> hrvData = new ArrayList<String>();
 	
 	private JRadioButton rdbtnAF3;
 	private JRadioButton rdbtnF7;
@@ -42,6 +49,7 @@ public class ChannelButtons implements ActionListener {
 	private JRadioButton rdbtnF8;
 	private JRadioButton rdbtnAF4;
 	private JRadioButton rdbtnHR;
+	private JRadioButton rdbtnHRV;
 	
 	public ChannelButtons(JPanel tabPanel){
 		init(tabPanel);
@@ -180,10 +188,18 @@ public class ChannelButtons implements ActionListener {
 		rdbtnHR = new JRadioButton("HR");
 		rdbtnHR.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rdbtnHR.setBackground(Color.WHITE);
-		rdbtnHR.setBounds(6, 477, 51, 23);
+		rdbtnHR.setBounds(6, 580, 51, 23);
 		tabPanel.add(rdbtnHR);
 		rdbtnHR.addActionListener(this);
 		rdbtnHR.setActionCommand(rdbtnHR.getText());
+		
+		rdbtnHRV = new JRadioButton("HRV");
+		rdbtnHRV.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		rdbtnHRV.setBackground(Color.WHITE);
+		rdbtnHRV.setBounds(6, 620, 51, 23);
+		tabPanel.add(rdbtnHRV);
+		rdbtnHRV.addActionListener(this);
+		rdbtnHRV.setActionCommand(rdbtnHRV.getText());
 		
 		
 		ButtonGroup group = new ButtonGroup();
@@ -202,26 +218,64 @@ public class ChannelButtons implements ActionListener {
 	    group.add(rdbtnF4);
 	    group.add(rdbtnF8);
 	    
-	    singleChannelPlot = new SingleChannelPlot();
+	    ButtonGroup hrGroup = new ButtonGroup();
+	    hrGroup.add(rdbtnHR);
+	    hrGroup.add(rdbtnHRV);
+	    
+	    
 		setUnenable();
+		setHRUnenable();
 		
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		click=true;
-		if(e.getActionCommand()!="HR"){
+		
+		if(e.getActionCommand()!="HR" && e.getActionCommand()!="HRV"){
+			
+			SingleChannelPlot singleChannelPlot = new SingleChannelPlot();
+			occupied=true;
+			singleJPanel.removeAll();
+			
 			System.err.println(e.getActionCommand());
 			singleChannelPlot.setData(eegHelper.getChannel(totalData, Arrays.asList(chName).indexOf(e.getActionCommand())+1));
-			singleChannelPlot.init();
+			singleChannelPlot.setType("singleEEG");
+			singleChannelPlot.init();			
 			ChartPanel singleChannelp = new ChartPanel(singleChannelPlot.getChart());
 			if(singleChannelPlot.getChart()==null)
 				System.err.println("Single channel chart is null");
 			singleJPanel.add(singleChannelp, BorderLayout.CENTER);
 			singleChannelp.validate();
 	
-		}else {
+		}else if(e.getActionCommand()=="HR"){
+				
+			SingleChannelPlot singleChannelPlot = new SingleChannelPlot();
+			singleJPanel.removeAll();
+			double[] hr = new double[hrData.size()];
+			Data helper = new Data();
+			hr = helper.convertTodouble(hrData);
+//			System.err.println(e.getActionCommand() + hr[0]);
+			singleChannelPlot.setData(hr);
+			singleChannelPlot.setType("HR");
+			singleChannelPlot.init();		
+			ChartPanel singleChannelp = new ChartPanel(singleChannelPlot.getChart());
+			singleJPanel.add(singleChannelp, BorderLayout.CENTER);
+			singleChannelp.validate();
+			occupied=false;
 			
+		}else if(e.getActionCommand()=="HRV"){
+
+			SingleChannelPlot singleChannelPlot = new SingleChannelPlot();
+			singleJPanel.removeAll();
+			double[] hrv = new double[hrvData.size()];
+			Data helper = new Data();
+			hrv = helper.convertTodouble(hrvData);
+			singleChannelPlot.setData(hrv);
+			singleChannelPlot.setType("HRV");
+			singleChannelPlot.init();		
+			ChartPanel singleChannelp = new ChartPanel(singleChannelPlot.getChart());
+			singleJPanel.add(singleChannelp, BorderLayout.CENTER);
+			singleChannelp.validate();
 		}
 		
 	}
@@ -241,7 +295,7 @@ public class ChannelButtons implements ActionListener {
 		rdbtnF4.setEnabled(true);
 		rdbtnF8.setEnabled(true);
 		rdbtnAF4.setEnabled(true);
-		rdbtnHR.setEnabled(true);
+		
 	}
 	
 	public void setUnenable(){
@@ -259,13 +313,19 @@ public class ChannelButtons implements ActionListener {
 		rdbtnF4.setEnabled(false);
 		rdbtnF8.setEnabled(false);
 		rdbtnAF4.setEnabled(false);
+		
+	}
+	
+	public void setHRenable(){
+		rdbtnHR.setEnabled(true);
+		rdbtnHRV.setEnabled(true);
+	}
+	
+	public void setHRUnenable(){
 		rdbtnHR.setEnabled(false);
+		rdbtnHRV.setEnabled(false);
 	}
-	
-	
-	public JFreeChart getChart(){
-		return singleChannelPlot.getChart();
-	}
+
 	
 	public void setPanel(JPanel p){
 		singleJPanel =p;
@@ -275,4 +335,20 @@ public class ChannelButtons implements ActionListener {
 		totalData = _totalData;
 		System.err.println(_totalData[0][0]);
 	}
+	
+	public void setHRData(List<String> _hr){
+		for(String h:_hr)
+			hrData.add(h);
+	}
+	
+	public void setHRVData(List<String> _hrv){
+		System.out.println("ChannelButtons.setHRVData()" +_hrv.size());
+		
+		for(String h:_hrv){
+			hrvData.add(h);
+			//System.err.println(h);
+		}
+	}
+	
+	
 }

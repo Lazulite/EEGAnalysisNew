@@ -47,12 +47,6 @@ public  class BarChart3DPlot implements DatasetChangeListener {
 		dataset.setValue(data[1], dataset.getRowKey(1), dataset.getColumnKey(1));
 		dataset.setValue(data[2], dataset.getRowKey(2), dataset.getColumnKey(2));
 		dataset.setValue(data[3], dataset.getRowKey(3), dataset.getColumnKey(3));
-//    	dataset.addValue(data[0], "1", "Delta");
-//        dataset.addValue(data[1], "2", "Theta");
-//        dataset.addValue(data[2], "3", "Alpha");
-//        dataset.addValue(data[3], "4", "Beta");
-		//System.err.println("update");
-		//dataset.clear();
     }
     
     private CategoryDataset createDataset() {
@@ -85,13 +79,7 @@ public  class BarChart3DPlot implements DatasetChangeListener {
         plot.setBackgroundPaint(Color.white);
         plot.setDomainGridlinePaint(Color.black);
         plot.setRangeGridlinePaint(Color.black);
-        //plot.setRangeZeroBaselinePaint(Color.black);
-        //plot.setDomainCrosshairPaint(Color.black);
         final CategoryAxis axis = plot.getDomainAxis();
-        
-//        axis.setCategoryLabelPositions(
-//            CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 20.0)
-//        );
         
         final CategoryItemRenderer renderer = plot.getRenderer();
         renderer.setItemLabelsVisible(true);

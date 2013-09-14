@@ -19,20 +19,57 @@ import org.jfree.data.xy.XYDataset;
 
 public class SingleChannelPlot {
 
-    private static final int COUNT = 2 * 200;
-    private static final int FAST = 100;
-    private static final int SLOW = FAST * 5;
+    private int COUNT = 0;
+    private int FAST = 0;
+    private int SLOW = 0;
+    private int MIN=0;
+    private int MAX=0;
     private Timer timer;
     private JFreeChart chart;
     private double[] channel;
     private int i;
-
+    private String type;
+    
     public SingleChannelPlot() {
     }
+    
+    
+    public void setType(String _type){
+    	type=_type;
+    	
+    	if(type=="HRV"){
+    		COUNT=50;
+    		FAST=500;
+    		MIN=850;
+    		MAX=1200;
+    	}
+    	if(type == "HR"){
+    		COUNT=50;
+    		FAST=500;
+    		MIN=50;
+    		MAX=120;
+    	}
+    	if(type=="singleEEG")
+    	{
+    		COUNT=128*5;
+    		FAST=1;
+    		MIN=3500;
+    		MAX=5500;
+    	}
+
+    }
+    
+    
     
     public void init(){
     	 final DynamicTimeSeriesCollection dataset = new DynamicTimeSeriesCollection(1, COUNT, new Second());
          dataset.setTimeBase(new Second(0, 0, 0, 1, 1, 2011));
+//         if(type=="HR")
+//        	 dataset.addSeries(toDoulbe(), 0, "");
+//         if(type=="HRV")
+//        	 dataset.addSeries(toDoulbe(), 750, "");
+//         if(type=="singleEEG")
+//        	 dataset.addSeries(toDoulbe(), 4100, "");
          
          dataset.addSeries(toDoulbe(), 0, "");
          chart = createChart(dataset);
@@ -43,7 +80,23 @@ public class SingleChannelPlot {
 
              @Override
              public void actionPerformed(ActionEvent e) {
-                 newData[0] = (float) getNext();
+                 if(i<channel.length){
+                	 newData[0] = (float) getNext();
+                 }else {
+                	 if(type=="HR")
+                		 newData[0]=60;
+                	 else {
+						newData[0]=900;
+					}
+				}
+                 
+/*                 if(i>=channel.length-1){
+                	 +                 newData[0]=1000;
+                	 +               }else{
+                	                   newData[0] = (float) getNext();
+                	 +               }*/
+                 
+                
                  dataset.advanceTime();
                  dataset.appendData(newData);
              }
@@ -52,8 +105,8 @@ public class SingleChannelPlot {
     }
 
     public void setData(double[] _channel){
-    	channel=_channel;
-    	System.err.println(channel[0]);
+    	channel = new double[_channel.length];
+    	System.arraycopy(_channel, 0, channel, 0, _channel.length);
     }
     
     private float[] toDoulbe() {
@@ -66,9 +119,9 @@ public class SingleChannelPlot {
 	}
     
     private double getNext() {
+    	double result = channel[i]; 
     	i++;
-    	//System.err.println("getNext " + channel[i]);
-        return channel[i];  
+        return result;  
     }
 
 	private JFreeChart createChart(final XYDataset dataset) {
@@ -79,11 +132,18 @@ public class SingleChannelPlot {
         plot.setBackgroundPaint(Color.white);
         plot.setDomainGridlinePaint(Color.black);
         plot.setRangeGridlinePaint(Color.black);
+        
         ValueAxis domain = plot.getDomainAxis();
-        domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
-        //range.setRange(4000, 4500);
-        range.setAutoRange(true);
+        if(type=="singleEEG"){
+        	domain.setAutoRange(true);
+        	range.setAutoRange(true);
+        }else if(type=="HR"){
+        	range.setAutoRangeMinimumSize(50,false);
+//        	range.setRange(MIN, MAX);
+        }else {
+			range.setAutoRange(true);
+		}
         return result;
     }
 
