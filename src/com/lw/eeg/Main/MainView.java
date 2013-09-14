@@ -216,6 +216,8 @@ public class MainView extends JFrame {
 				// TODO Auto-generated method stub
 				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
 		        int index = sourceTabbedPane.getSelectedIndex();
+		        //
+		        txtlogger.append("Tab changed to: "+newline + sourceTabbedPane.getTitleAt(index)+newline);
 		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
 		        	//allChannelPanel.removeAll();
@@ -498,10 +500,10 @@ public class MainView extends JFrame {
 		    		 for(int i = 0; i<dpList.size(); i++){
 		    			 	csvHelper.writeCSV("timestamp,");
 		    			    JsonObject dps = dpList.get(i).getAsJsonObject();
-		    			    System.err.println("EachdataPoints "+i+"=>"+dpList.toString());
+		    			    //System.err.println("EachdataPoints "+i+"=>"+dpList.toString());
 		    			    
 		    			    String fromstart = dps.get("at").getAsString();
-		    			    System.err.println("EachdataPoints "+i+"at=>"+fromstart);
+		    			    //System.err.println("EachdataPoints "+i+"at=>"+fromstart);
 		    			    JsonArray valueList = dps.get("value_list").getAsJsonArray();
 		    			   
 		    			    JsonObject hrObj = valueList.get(1).getAsJsonObject();

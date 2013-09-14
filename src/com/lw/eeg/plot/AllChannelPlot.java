@@ -23,6 +23,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
+import weka.filters.unsupervised.attribute.ChangeDateFormat;
+
 public class AllChannelPlot {
 
     private static final float MINMAX = 5500;
@@ -78,44 +80,18 @@ public class AllChannelPlot {
     	//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
     	for(int i=0; i<rawdata.length-1;i++){
         	AF3[i] = Float.valueOf(rawdata[i][1])+750;
-    	}
-    	for(int i=0; i<rawdata.length-1;i++){
-        	F7[i] = Float.valueOf(rawdata[i][2])-400;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
-        	F3[i] = Float.valueOf(rawdata[i][3])-400*2-750;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
-        	FC5[i] = Float.valueOf(rawdata[i][4])-400*3+500;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
+        	F7[i] = Float.valueOf(rawdata[i][2])-400+100;
+        	F3[i] = Float.valueOf(rawdata[i][3])-400*2-750+100;
+        	FC5[i] = Float.valueOf(rawdata[i][4])-400*3+500+200+100+100;
         	T7[i] = Float.valueOf(rawdata[i][5])-400*4-100;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	P7[i] = Float.valueOf(rawdata[i][6])-400*5-750;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	O1[i] = Float.valueOf(rawdata[i][7])-400*6-750;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	O2[i] = Float.valueOf(rawdata[i][8])-400*7-1500;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	P8[i] = Float.valueOf(rawdata[i][9])-400*8-1500;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	T8[i] = Float.valueOf(rawdata[i][10])-400*9-2000;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	FC6[i] = Float.valueOf(rawdata[i][11])-400*10-2350;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	F4[i] = Float.valueOf(rawdata[i][12])-400*11-3750;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	F8[i] = Float.valueOf(rawdata[i][13])-400*12-2500;
-        }
-    	for(int i=0; i<rawdata.length-1;i++){
         	AF4[i] = Float.valueOf(rawdata[i][14])-400*13-3150;
         }
     	//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
@@ -142,20 +118,22 @@ public class AllChannelPlot {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                newData[0] = (float) getNext(AF3);
-                newData[1] = (float) getNext(F7);
-                newData[2] = (float) getNext(F3);
-                newData[3] = (float) getNext(FC5);
-                newData[4] = (float) getNext(T7);
-                newData[5] = (float) getNext(P7);
-                newData[6] = (float) getNext(O1);
-                newData[7] = (float) getNext(O2);
-                newData[8] = (float) getNext(P8);
-                newData[9] = (float) getNext(T8);
-                newData[10] = (float) getNext(FC6);
-                newData[11] = (float) getNext(F4);
-                newData[12] = (float) getNext(F8);
-                newData[13] = (float) getNext(AF4);
+            	if(i<rawdata.length){
+            		newData[0] = (float) getNext(AF3);
+            		newData[1] = (float) getNext(F7);
+            		newData[2] = (float) getNext(F3);
+            		newData[3] = (float) getNext(FC5);
+            		newData[4] = (float) getNext(T7);
+            		newData[5] = (float) getNext(P7);
+            		newData[6] = (float) getNext(O1);
+            		newData[7] = (float) getNext(O2);
+            		newData[8] = (float) getNext(P8);
+            		newData[9] = (float) getNext(T8);
+            		newData[10] = (float) getNext(FC6);
+            		newData[11] = (float) getNext(F4);
+            		newData[12] = (float) getNext(F8);
+            		newData[13] = (float) getNext(AF4);
+            	}
                 dataset.advanceTime();
                 dataset.appendData(newData);
             }
@@ -178,10 +156,13 @@ public class AllChannelPlot {
         plot.setDomainGridlinePaint(Color.black);
         plot.setRangeGridlinePaint(Color.black);
         plot.clearRangeMarkers();
+        plot.clearDomainMarkers();
         ValueAxis domain = plot.getDomainAxis();
-        domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
+        domain.setAutoRange(true);
         range.setRange(-MINMAX, MINMAX);
+        range.setVisible(false);
+        domain.setVisible(false);
         return result;
     }
    

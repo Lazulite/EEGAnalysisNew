@@ -144,6 +144,7 @@ public class SingleChannelPlot {
         }else {
 			range.setAutoRange(true);
 		}
+        domain.setVisible(false);
         return result;
     }
 
