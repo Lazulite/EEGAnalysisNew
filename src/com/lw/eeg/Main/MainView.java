@@ -104,6 +104,20 @@ public class MainView extends JFrame {
 			e.printStackTrace();
 		}
 		
+		
+
+		JPanel logPanel = new JPanel();
+		logPanel.setLayout(new BorderLayout());
+		final JTextArea txtlogger = new JTextArea();
+		DefaultCaret caret = (DefaultCaret)txtlogger.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		txtlogger.setFont(new Font("Nyala", Font.PLAIN, 14));
+		JScrollPane logScrollPane = new JScrollPane(txtlogger);
+		logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);		
+		logPanel.add(logScrollPane);
+		txtlogger.setLineWrap(true);
+		txtlogger.setText("Welcome!"+newline);
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainView.class.getResource("/com/lw/gui/resource/brain_spawn.png")));
 		setTitle("JHealth");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -148,6 +162,9 @@ public class MainView extends JFrame {
 				System.err.println("userToken is "+usertoken.toString());
 				mtoken = usertoken.get("token").getAsString();
 				System.err.println("Token is "+mtoken);
+				
+				txtlogger.append("Use: lei" + newline);
+				txtlogger.append("Login successful"+newline);
 			}
 		});
 		
@@ -184,17 +201,6 @@ public class MainView extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
-		JPanel logPanel = new JPanel();
-		logPanel.setLayout(new BorderLayout());
-		JTextArea txtlogger = new JTextArea();
-		DefaultCaret caret = (DefaultCaret)txtlogger.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		txtlogger.setFont(new Font("Nyala", Font.PLAIN, 14));
-		JScrollPane logScrollPane = new JScrollPane(txtlogger);
-		logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		
-		logPanel.add(logScrollPane);
 		
 
 		//Tab Panel Init
@@ -354,7 +360,8 @@ public class MainView extends JFrame {
 							eegRawData = eegData.init();
 							eegRawData=eegData.readData(eegData.init());
 							adjeegdata=eegData.adjustData(eegRawData, 128*5,128*5);
-//							
+							txtlogger.append("Loaded EEG"+newline);
+							
 //							EMOData emoData = new EMOData(emoPath);
 //							String[][] emoRawData = emoData.readData(emoData.init());
 //							String[][] adjEmoData=emoData.adjustData(emoRawData, 128*5, 128*5);
@@ -436,11 +443,10 @@ public class MainView extends JFrame {
 						}
 						
 					}else{
-						final Dialog dialog_confirm = new Dialog(frame, "Confirm");
+						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -462,10 +468,10 @@ public class MainView extends JFrame {
 		      public void mouseClicked(MouseEvent e){
 		    	 //TODO  http get request load heart data
 		    	 channelButtons.setHRenable();
-		    	 
+		    	 txtlogger.append("Loading HR data"+newline);
 		    	 singleChannelPanel.removeAll();
 		    	 if(mtoken!=null){
-		    		 
+		    		
 		    		 List<String> hrList = new ArrayList<String>();
 		    		 CSVHelper csvHelper = new CSVHelper();
 		    		 List<String> hrvList = new ArrayList<String>();
@@ -512,10 +518,8 @@ public class MainView extends JFrame {
 		    		 
 		    		 channelButtons.setHRData(hrList);
 		    		 channelButtons.setHRVData(hrvList);
-		    		 System.out
-							.println("MainView.setPanel().new MouseAdapter() {...}.mouseClicked()");
-		    		 System.err.println("hr"+hrList.get(0));
-		    		 System.err.println("hrv"+hrvList.get(0) + hrvList.size());
+		    		 
+		    		 txtlogger.append("Loaded HR"+newline);
 		    		 //plot
 		    		 
 		    		 //get datapoints from 0, a pair each time
@@ -562,11 +566,10 @@ public class MainView extends JFrame {
 //					if(list.get(last).equals("csv")){
 //						
 //					}else{
-//						final Dialog dialog_confirm = new Dialog(frame, "Confirm");
+//						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
 //						dialog_confirm.setLayout(new BorderLayout(0, 0));
 //						dialog_confirm.setBackground(Color.WHITE);
 //						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-//						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 //						dialog_confirm.setSize(400, 100);
 //						dialog_confirm.setLocation(100, 100);
 //						dialog_confirm.setVisible(true);
@@ -872,7 +875,6 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -927,7 +929,6 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
@@ -979,7 +980,6 @@ public class MainView extends JFrame {
 						dialog_confirm.setLayout(new BorderLayout(0, 0));
 						dialog_confirm.setBackground(Color.WHITE);
 						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-						txtlogger.append("Check your File, Please Select \".csv\" File!!\n");
 						dialog_confirm.setSize(400, 100);
 						dialog_confirm.setLocation(100, 100);
 						dialog_confirm.setVisible(true);
