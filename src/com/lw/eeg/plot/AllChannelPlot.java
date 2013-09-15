@@ -118,7 +118,7 @@ public class AllChannelPlot {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-            	if(i<rawdata.length){
+            	if(i<rawdata.length-1){
             		newData[0] = (float) getNext(AF3);
             		newData[1] = (float) getNext(F7);
             		newData[2] = (float) getNext(F3);

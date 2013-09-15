@@ -314,7 +314,6 @@ public class MainView extends JFrame {
 		        }
 		        if(sourceTabbedPane.getTitleAt(index) == "FFT"){
 		        	channelButtonsFFT.setEnable();
-		        	channelButtonsFFT.displayDefault();
 		        	
 		        }
 			}
@@ -375,6 +374,14 @@ public class MainView extends JFrame {
 							List<List<String>> fts_1 = fCalc.getfts_1();
 							List<List<String>> fft_1 = fCalc.getfft_1();
 							Data helper =new Data();
+							
+							
+							channelButtonsFFT.setEnable();
+							channelButtonsFFT.setRawData(adjeegdata);
+							channelButtonsFFT.setfftData(fCalc.getfftList());
+							channelButtonsFFT.setftsData(fCalc.getftsList());
+							channelButtonsFFT.setftsPanel(featurePanel);
+							channelButtonsFFT.setfftPanel(fftPanel);
 							//TODO time control update 0.5s
 //							long cnttp=System.currentTimeMillis();
 //							int i=0;
@@ -422,9 +429,6 @@ public class MainView extends JFrame {
 									SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
 									singleLineChartPlot.setPanel(fftPanel);
 									singleLineChartPlot.setData(fftbuffer);
-//									featurep.revalidate();
-//									featurep.repaint();
-
 							}
 
 	

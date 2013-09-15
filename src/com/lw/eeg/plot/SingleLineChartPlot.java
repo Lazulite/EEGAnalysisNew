@@ -25,12 +25,11 @@ public class SingleLineChartPlot {
 	}
 
 	public JFreeChart getChart(){
-		System.out.println("SingleLineChartPlot.getChart()");
 		return mChart;
 	}
 
 	public void setData(double[]  _data){
-		System.out.println("SingleLineChartPlot.setData()");
+		//System.out.println("SingleLineChartPlot.setData()");
 
 		data = new double[_data.length];
 		System.arraycopy(_data, 0, data, 0, _data.length);
@@ -68,12 +67,12 @@ public class SingleLineChartPlot {
         plot.getDomainAxis().setAutoRange(true);
         plot.getRangeAxis().setAutoRange(true);
         
-        System.out.println("SingleLineChartPlot.creatChart()");
+       // System.out.println("SingleLineChartPlot.creatChart()");
         return chart;
 
     }
     private XYSeriesCollection createSeries(){
-    	System.out.println("SingleLineChartPlot.createSeries()");
+    	//System.out.println("SingleLineChartPlot.createSeries()");
     	XYSeriesCollection collection = new XYSeriesCollection();
     	
 		XYSeries series = new XYSeries("");

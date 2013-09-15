@@ -2,8 +2,10 @@ package com.lw.eeg.Main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,16 +20,24 @@ import org.jfree.chart.JFreeChart;
 
 import com.lw.eeg.data.*;
 import com.lw.eeg.plot.*;
+import com.lw.eeg.processing.*;
 
 	
 public class ChannelButtonsFFT implements ActionListener{
-	private String[] whichch= new String[]{"false", "false","false","false","false","false","false","false","false","false","false","false","false","false"};
+	private String[] whichch= new String[]{"true", "false","false","false","false","false","false","false","false","false","false","false","false","false"};
 	private String[] chName= new String[]{"AF3","F7","F3","FC5","T7","P7","O1","O2","P8","T8","FC6","F4","F8","AF4"};
+	private List<String> chNameList= new ArrayList<String>();
+	private List<String> whichchList = new ArrayList<String>();
 	private SingleLineChartPlot singleLineChartPlot;
 	private EEGData eegHelper = new EEGData();
 	public boolean click = false;
 	public JPanel singlefftPanel;
-	private List<List<String>> totalData;
+	private List<List<List<String>>> fftDataList;
+	private List<List<List<String>>> ftsDataList;
+	private String[][] rawData;
+	private JPanel fftJPanel;
+	private JPanel ftsJPanel;
+	
 	
 	private JRadioButton rdbtnAF3;
 	private JRadioButton rdbtnF7;
@@ -53,10 +63,11 @@ public class ChannelButtonsFFT implements ActionListener{
 	
 	
 	public ChannelButtonsFFT(JPanel p){
+		for(int i=0; i<chName.length; i++){
+			chNameList.add(chName[i]);
+			whichchList.add(whichch[i]);
+		}
 		init(p);
-	}
-	public void setplotPanel(JPanel _sJPanel){
-		singlefftPanel=_sJPanel;
 	}
 	
 
@@ -67,6 +78,7 @@ public class ChannelButtonsFFT implements ActionListener{
 		tabPanel_1.add(rdbtnAF3);
 		rdbtnAF3.addActionListener(this);
 		rdbtnAF3.setActionCommand(rdbtnAF3.getText());
+		rdbtnAF3.setSelected(true);
 		
 		rdbtnF7 = new JRadioButton("F7");
 		rdbtnF7.setBackground(Color.WHITE);
@@ -191,7 +203,6 @@ public class ChannelButtonsFFT implements ActionListener{
 		
 		
 		ButtonGroup group = new ButtonGroup();
-	    group.add(rdbtnAF3);
 	    group.add(rdbtnF7);
 	    group.add(rdbtnF3);
 	    group.add(rdbtnF3);
@@ -213,7 +224,6 @@ public class ChannelButtonsFFT implements ActionListener{
 	    winGroup.add(chkBoxHan);
 	    winGroup.add(chkBoxRec);
 	    
-	    singleLineChartPlot = new SingleLineChartPlot();
 		setUnenable();
 		
 	}
@@ -221,39 +231,125 @@ public class ChannelButtonsFFT implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		//System.out.print(click);
-		if(e.getActionCommand()!="HR"){
-			//TODO use getChannel to get single channel
-			// plot barchart and line chart
-			// set whichch
+		for(int i=0; i<chName.length; i++){
+			whichchList.add(whichch[i]);
+		}
+		if(chNameList.contains(e.getActionCommand())){
+
+			if(e.getActionCommand()!="AF3"){
+				System.out.println("ChannelButtonsFFT.actionPerformed()");
+				System.err.println("Channel" + e.getActionCommand() + " =>" + chNameList.indexOf(e.getActionCommand()));
+				
+				rdbtnAF3.setSelected(false);
+				whichchList.add(chNameList.indexOf(e.getActionCommand()), "true");
+				Data helper =new Data();
+				List<List<String>> ftsTemp= new ArrayList<List<String>>();
+				List<List<String>> fftTemp= new ArrayList<List<String>>();
+				ftsTemp = ftsDataList.get(chNameList.indexOf(e.getActionCommand()));
+				fftTemp = fftDataList.get(chNameList.indexOf(e.getActionCommand()));
+				
+				for(int f=0; f<ftsTemp.size()-1; f++){
+//					System.out.println("BARCHART" + f);
+						ftsJPanel.removeAll();
+						double[] featurebuffer = new double[4];
+						featurebuffer = helper.convertTodouble(ftsTemp.get(f));
+						BarChart3DPlot featurePlot = new BarChart3DPlot();
+						featurePlot.setData(featurebuffer);
+						ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+						ftsJPanel.add(featurep, BorderLayout.CENTER);
+						featurep.revalidate();
+						featurep.repaint();
+
+				}
+
+				for(int f=0; f<fftTemp.size()-1; f++){
+					System.out.println("LineCHART" + f);
+						fftJPanel.removeAll();
+						double[] fftbuffer = new double[4];
+						fftbuffer = helper.convertTodouble(fftTemp.get(f));		
+						System.err.println("Delta=> " + fftbuffer[0]);
+						SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
+						singleLineChartPlot.setPanel(fftJPanel);
+						singleLineChartPlot.setData(fftbuffer);
+				}
+
+			}else{
+				whichchList.add(chNameList.indexOf(e.getActionCommand()), "true");
+			}
+			
+		}else {
+			if(e.getActionCommand()!="Hanning"){
+				FeaturesCalc fCalc = new FeaturesCalc();
+				fCalc.setWindow(e.getActionCommand());
+				fCalc.calc(rawData);
+				
+				Data helper =new Data();
+				List<List<String>> ftsTemp= new ArrayList<List<String>>();
+				List<List<String>> fftTemp= new ArrayList<List<String>>();
+				System.err.println("In window func " + whichchList.indexOf("true"));
+				ftsTemp = fCalc.getftsList().get(whichchList.indexOf("true"));
+				fftTemp = fCalc.getfftList().get(whichchList.indexOf("true"));
+				
+				for(int f=0; f<ftsTemp.size()-1; f++){
+//					System.out.println("BARCHART" + f);
+						ftsJPanel.removeAll();
+						double[] featurebuffer = new double[4];
+						featurebuffer = helper.convertTodouble(ftsTemp.get(f));
+						BarChart3DPlot featurePlot = new BarChart3DPlot();
+						featurePlot.setData(featurebuffer);
+						ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+						ftsJPanel.add(featurep, BorderLayout.CENTER);
+						featurep.revalidate();
+						featurep.repaint();
+
+				}
+
+				for(int f=0; f<fftTemp.size()-1; f++){
+					System.out.println("LineCHART" + f);
+						fftJPanel.removeAll();
+						double[] fftbuffer = new double[4];
+						fftbuffer = helper.convertTodouble(fftTemp.get(f));		
+						System.err.println("Delta=> " + fftbuffer[0]);
+						SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
+						singleLineChartPlot.setPanel(fftJPanel);
+						singleLineChartPlot.setData(fftbuffer);
+				}
+				
+				
+				
+			}
 			//if e.getActionCommand == win
 			//get current channel, then 
 			//removeall re fcalc plotall
-			
-			
-		}else {
-			
 		}
 		
-	}
-	
-	public void displayDefault(){
-		//plot af3 and hanning window as default
 		
 	}
+	public void setfftPanel(JPanel p){
+		fftJPanel = p;
+	}
 	
+	public void setftsPanel(JPanel p){
+		ftsJPanel = p;
+	}
 	
 	
 	public JFreeChart getChart(){
 		return singleLineChartPlot.getChart();
 	}
 	
-	public void setData(List<List<String>> _totalData){
-		totalData = _totalData;
-		//TODO fcalc all features and fft result
-		
-		
-		System.err.println(_totalData.get(0).get(0));
+	public void setfftData(List<List<List<String>>> _fftDataList){
+		fftDataList =_fftDataList;
 	}
+	
+	public void setftsData(List<List<List<String>>> _ftsDataList){
+		ftsDataList =_ftsDataList;
+	}
+	
+	public void setRawData(String[][] r){
+		rawData=r;
+	}
+	
 	public void setEnable(){
 		rdbtnAF3.setEnabled(true);
 		rdbtnF7.setEnabled(true);

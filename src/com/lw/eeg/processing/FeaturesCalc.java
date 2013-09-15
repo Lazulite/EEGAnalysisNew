@@ -15,8 +15,9 @@ public class FeaturesCalc {
 	private static String windowType = "HANNING";
 	private static double[] fftresult;
 	
-	ArrayList<ArrayList<ArrayList<String>>> fftList = new ArrayList<ArrayList<ArrayList<String>>>();
-	ArrayList<ArrayList<ArrayList<String>>> featureList = new ArrayList<ArrayList<ArrayList<String>>>();
+	List<List<List<String>>> fftList = new ArrayList<List<List<String>>>();
+	List<List<List<String>>> ftsList = new ArrayList<List<List<String>>>();
+
 	//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
 	List<List<String>> fft_1 = new ArrayList<List<String>>();
 	List<List<String>> fft_2 = new ArrayList<List<String>>();
@@ -255,11 +256,49 @@ public class FeaturesCalc {
 			
 		}
 		
+		fftList.add(fft_1);
+		fftList.add(fft_2);
+		fftList.add(fft_3);
+		fftList.add(fft_4);
+		fftList.add(fft_5);
+		fftList.add(fft_6);
+		fftList.add(fft_7);
+		fftList.add(fft_8);
+		fftList.add(fft_9);
+		fftList.add(fft_10);
+		fftList.add(fft_11);
+		fftList.add(fft_12);
+		fftList.add(fft_13);
+		fftList.add(fft_14);
 		
+		ftsList.add(fts_1);
+		ftsList.add(fts_2);
+		ftsList.add(fts_3);
+		ftsList.add(fts_4);
+		ftsList.add(fts_5);
+		ftsList.add(fts_6);
+		ftsList.add(fts_7);
+		ftsList.add(fts_8);
+		ftsList.add(fts_9);
+		ftsList.add(fts_10);
+		ftsList.add(fts_11);
+		ftsList.add(fts_12);
+		ftsList.add(fts_13);
+		ftsList.add(fts_14);
+
 	}
 	
+	public List< List<List<String>>> getfftList(){
+		return fftList;
+	}
+	
+	public List< List<List<String>>> getftsList(){
+		return ftsList;
+	}
+	
+	
+	
 	public List<List<String>> getfft_1(){
-		System.err.println("bug==>>>>" + fft_1.size());
 		return fft_1;
 	}
 	public List<List<String>> getfft_2(){
