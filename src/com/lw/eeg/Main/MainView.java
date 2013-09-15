@@ -30,6 +30,7 @@ import org.jfree.chart.ChartPanel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.omg.CORBA.Current;
 import org.omg.CORBA.SystemException;
 
 import weka.classifiers.Classifier;
@@ -50,15 +51,16 @@ import com.lw.eeg.jsonlib.*;
 
 public class MainView extends JFrame {
 	
-	private static JPanel contentPane;
-	private static JFrame frame;
-	private static JPanel allChannelPanel; // AllChannel panel
-	private static JPanel singleChannelPanel; // Singchannel panel
-	private static JPanel featurePanel; // Feature Panel
-	private static JPanel fftPanel; // FFT panel
-	//private static FeaturesCalc fCalc;
-	private String[][] adjeegdata;
+	private JPanel contentPane;
+	private JFrame frame;
+	private JPanel allChannelPanel; // AllChannel panel
+	private JPanel singleChannelPanel; // Singchannel panel
+	private JPanel featurePanel; // Feature Panel
+	private JPanel fftPanel; // FFT panel
+	private ChannelButtonsFFT channelButtonsFFT;
 	private ChannelButtons channelButtons;
+	
+	private String[][] adjeegdata;	
 	private EEGLog eegLogger;
 	private wikiHttp wikiHelper;
 	private String excitePath;
@@ -83,11 +85,8 @@ public class MainView extends JFrame {
     
 	public MainView() throws Exception {
 		setPanel();
-//		txtlogger = new JTextArea();
-//		txtlogger.setText("Begin");
-		
-		//txtlogger.setText("Welcome!");
-				//excitePath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
+
+		//excitePath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
 		//relaxPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
 		//testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
 
@@ -203,32 +202,12 @@ public class MainView extends JFrame {
 		setContentPane(contentPane);
 		
 
-		//Tab Panel Init
-		// Tab Panel
-
-		//TODO - change tab label bcolor
-			//tabbedPane.addTab(null, myComponent);
-		 	//tabbedPane.setTabComponentAt(0, new JLabel("Tab"));
+		
+		
+		//Tab Panels Init
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		ChangeListener changeListener = new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
-		        int index = sourceTabbedPane.getSelectedIndex();
-		        //
-		        txtlogger.append("Tab changed to: "+newline + sourceTabbedPane.getTitleAt(index)+newline);
-		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
-		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
-		        	//allChannelPanel.removeAll();
-		        }
-		        if(sourceTabbedPane.getTitleAt(index) == "Raw Data"){
-		        }
-			}
-		 };
-		
-		
-		tabbedPane.addChangeListener(changeListener);
+
 		JPanel tabPanel = new JPanel();
 		tabPanel.setBackground(new Color(255, 255, 255));
 		tabbedPane.addTab("Raw Data", null, tabPanel, null);
@@ -238,13 +217,7 @@ public class MainView extends JFrame {
 		allChannelPanel.setBounds(63, 6, 1150, 534);
 		tabPanel.add(allChannelPanel);
 		allChannelPanel.setLayout(new BorderLayout(0, 0));
-		///XXXX
-//				SingleChannelPlot singleChannelPlot = new SingleChannelPlot("xx");
-//				ChartPanel p = new ChartPanel(singleChannelPlot.getChart());
-//				allChannelPanel.add(p, BorderLayout.CENTER);
-//				p.validate();
 
-	
 		singleChannelPanel = new JPanel();
 		singleChannelPanel.setBounds(63, 550, 1150, 117);
 		tabPanel.add(singleChannelPanel);
@@ -272,9 +245,7 @@ public class MainView extends JFrame {
 		tabPanel_1.setBackground(new Color(255, 255, 255));
 		tabbedPane.addTab(" FFT ", null, tabPanel_1, null);
 		tabPanel_1.setLayout(null);
-		
-		
-		
+
 		featurePanel = new JPanel();
 		featurePanel.setBackground(new Color(255, 255, 255));
 		featurePanel.setBounds(290, 10, 743, 404);
@@ -284,9 +255,7 @@ public class MainView extends JFrame {
 		fftPanel.setBounds(290, 418, 743, 245);
 		tabPanel_1.add(fftPanel);
 		
-		ChannelButtonsFFT channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);
-		channelButtonsFFT.setEnable();
-//		
+		channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);
 		
 		// Tab panel3
 		JPanel tabPanel_2 = new JPanel();
@@ -330,8 +299,32 @@ public class MainView extends JFrame {
 		final JTextArea correlResult = new JTextArea();
 		correlResult.setBounds(332, 508, 710, 84);
 		tabPanel_3.add(correlResult);
-		//txtlogger.append("TEST");
-		//txtlogger.setText("EEG Data Log.....\n");
+
+	
+		ChangeListener changeListener = new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+		        int index = sourceTabbedPane.getSelectedIndex();
+		        //
+		        txtlogger.append("[Tab]=>"+ sourceTabbedPane.getTitleAt(index)+newline);
+		        System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
+		        if(sourceTabbedPane.getTitleAt(index) != "Raw Data"){
+		        	//allChannelPanel.removeAll();
+		        }
+		        if(sourceTabbedPane.getTitleAt(index) == "FFT"){
+		        	channelButtonsFFT.setEnable();
+		        	channelButtonsFFT.displayDefault();
+		        	
+		        }
+			}
+		 };
+		
+		
+		tabbedPane.addChangeListener(changeListener);
+		
+		
+		
 		
 		
 		// Button Item
@@ -357,23 +350,25 @@ public class MainView extends JFrame {
 						String path = dialog.getDirectory() + dialog.getFile();
 						EEGData eegData = new EEGData(path);
 						String[][] eegRawData;
-						//tring emoPath="C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130816_175754_emostate.csv";
 						try {
 							eegRawData = eegData.init();
 							eegRawData=eegData.readData(eegData.init());
 							adjeegdata=eegData.adjustData(eegRawData, 128*5,128*5);
-							txtlogger.append("Loaded EEG"+newline);
+							txtlogger.append("[EEG]Loaded"+newline);
 							
-//							EMOData emoData = new EMOData(emoPath);
-//							String[][] emoRawData = emoData.readData(emoData.init());
-//							String[][] adjEmoData=emoData.adjustData(emoRawData, 128*5, 128*5);
-							
-							
+							//Raw data Tab
 							AllChannelPlot allChannelPlot = new AllChannelPlot("xx", adjeegdata);
 							ChartPanel allChannelp = new ChartPanel(allChannelPlot.getChart());
 							allChannelPanel.add(allChannelp, BorderLayout.CENTER);
 							allChannelp.validate();
 							
+							
+							//Single Channel details
+							channelButtons.setEnable();
+							channelButtons.setData(adjeegdata);
+							channelButtons.setPanel(singleChannelPanel);
+							
+							//
 							//System.err.println("Before fCals");
 							FeaturesCalc fCalc = new FeaturesCalc();
 							fCalc.calc(adjeegdata);
@@ -398,34 +393,44 @@ public class MainView extends JFrame {
 //							}
 //							
 							//TODO time control update 0.5s
+							long cnttp=System.currentTimeMillis();
+							int i=0;
+							System.err.println(avgFeatureAF3.length);
 							for(int f=0; f<avgFeatureAF3.length; f++){
 								//System.err.println("BARCHART" + f);
-								featurePanel.removeAll();
-								double[] featurebuffer = new double[4];
-								System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
-//								for(double d:avgFeatureAF3[f])
-//									System.err.println("before setdata af3 " + d);
-//								for(double d:featurebuffer)
-//									System.err.println("before setdata " + d);	
-								BarChart3DPlot featurePlot = new BarChart3DPlot();
-								featurePlot.setData(featurebuffer);
-								ChartPanel featurep = new ChartPanel(featurePlot.getChart());
-								featurePanel.add(featurep, BorderLayout.CENTER);
-								featurep.validate();
-								featurep.repaint();
-							}
+								while(true){
+									if(((System.currentTimeMillis()-cnttp)%500)==0)
+									{	i++;
+										System.out.println(i);
+										featurePanel.removeAll();
+										double[] featurebuffer = new double[4];
+										System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
+										BarChart3DPlot featurePlot = new BarChart3DPlot();
+										featurePlot.setData(featurebuffer);
+										ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+										featurePanel.add(featurep, BorderLayout.CENTER);
+										featurep.revalidate();
+										featurep.repaint();
+										break;
+									}	
+									
+								}
+								
+//											featurePanel.removeAll();
+//											double[] featurebuffer = new double[4];
+//											System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
+//											BarChart3DPlot featurePlot = new BarChart3DPlot();
+//											featurePlot.setData(featurebuffer);
+//											ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+//											featurePanel.add(featurep, BorderLayout.CENTER);
+//											featurep.validate();
+//											featurep.repaint();
+									
+								}
+
 							
 							
-							
-							//Single Channel details
-							channelButtons.setEnable();
-							channelButtons.setData(adjeegdata);
-							channelButtons.setPanel(singleChannelPanel);
-//							if(channelButtons.click){
-//								ChartPanel singleChannelp = new ChartPanel(channelButtons.getChart());
-//								singleChannelPanel.add(singleChannelp, BorderLayout.CENTER);
-//								singleChannelp.validate();
-//							}
+
 							
 							
 							SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
@@ -470,7 +475,7 @@ public class MainView extends JFrame {
 		      public void mouseClicked(MouseEvent e){
 		    	 //TODO  http get request load heart data
 		    	 channelButtons.setHRenable();
-		    	 txtlogger.append("Loading HR data"+newline);
+		    	 txtlogger.append("[HR]Loading data"+newline);
 		    	 singleChannelPanel.removeAll();
 		    	 if(mtoken!=null){
 		    		
@@ -482,16 +487,13 @@ public class MainView extends JFrame {
 		    		 csvHelper.setFilename(csvHelper.getSimpleTime(time) + "_hrdata.csv");
 		    		 csvHelper.createFile_hrData();
 		    		 String hrURL = "http://wikihealth.bigdatapro.org:55555/healthbook/v1/health/title/heart_data/datapoints?accesstoken=3cabd0740e2b4fcba68f50c082cd8661&api_key=special-key";
-		    		 //String hrURL = rootURL+"health/title/heart_data/datapoints?accesstoken="+mtoken+"&api_key=special-key";
 		    		 wikiHttp newwiki = new wikiHttp(hrURL, "GET", null, null);
 		    		 InputStream result = newwiki.doInBackground();
 		    		 
 		    		 JsonReader reader = new JsonReader(new InputStreamReader(result));
 		    		 reader.setLenient(true);
-		    		 JsonParser parser = new JsonParser();
-		    		 //Log.e("RESPONSE", "before parsing json ");					
+		    		 JsonParser parser = new JsonParser();			
 		    		 JsonObject newobj = parser.parse(reader).getAsJsonObject();	
-		    		 //Log.e("RESPONSE", "Before obj.toString()");
 		    		 System.err.println("HRRESPONSE "+newobj.toString());
 
 		    		 JsonObject dpobj = newobj.get("datapoints_list").getAsJsonObject();
@@ -521,15 +523,7 @@ public class MainView extends JFrame {
 		    		 channelButtons.setHRData(hrList);
 		    		 channelButtons.setHRVData(hrvList);
 		    		 
-		    		 txtlogger.append("Loaded HR"+newline);
-		    		 //plot
-		    		 
-		    		 //get datapoints from 0, a pair each time
-		    		 // if total_points equal 1
-		    		 //while(true){}
-		    		 //while(total_points equal<=1){if flag = true, break}
-		    		 //if flag break//
-		    		 //
+		    		 txtlogger.append("[HR]Loaded "+newline);
 		    	 }
 		    	  
 		      }
@@ -994,9 +988,6 @@ public class MainView extends JFrame {
 				}
 			}
 		});
-
-		
-		
 
 		contentPane.setLayout(gl_contentPane);
 		

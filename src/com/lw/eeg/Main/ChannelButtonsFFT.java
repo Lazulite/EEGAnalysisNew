@@ -43,7 +43,6 @@ public class ChannelButtonsFFT implements ActionListener{
 	private JRadioButton rdbtnF4;
 	private JRadioButton rdbtnF8;
 	private JRadioButton rdbtnAF4;
-	private JRadioButton rdbtnHR;
 	
 	private JCheckBox chkBoxHam;
 	private JCheckBox chkBoxHan;
@@ -160,13 +159,6 @@ public class ChannelButtonsFFT implements ActionListener{
 		rdbtnAF4.addActionListener(this);
 		rdbtnAF4.setActionCommand(rdbtnAF4.getText());
 		
-		rdbtnHR = new JRadioButton("HR");
-		rdbtnHR.setBackground(Color.WHITE);
-		rdbtnHR.setBounds(63, 346, 51, 23);
-		tabPanel_1.add(rdbtnHR);
-		rdbtnHR.addActionListener(this);
-		rdbtnHR.setActionCommand(rdbtnHR.getText());
-		
 		
 		chkBoxHan = new JCheckBox("Hanning");
 		chkBoxHan.setBackground(Color.WHITE);
@@ -243,6 +235,25 @@ public class ChannelButtonsFFT implements ActionListener{
 		}
 		
 	}
+	
+	public void displayDefault(){
+		//plot af3 and hanning window as default
+		
+	}
+	
+	
+	
+	public JFreeChart getChart(){
+		return singleLineChartPlot.getChart();
+	}
+	
+	public void setData(List<List<String>> _totalData){
+		totalData = _totalData;
+		//TODO fcalc all features and fft result
+		
+		
+		System.err.println(_totalData.get(0).get(0));
+	}
 	public void setEnable(){
 		rdbtnAF3.setEnabled(true);
 		rdbtnF7.setEnabled(true);
@@ -258,7 +269,7 @@ public class ChannelButtonsFFT implements ActionListener{
 		rdbtnF4.setEnabled(true);
 		rdbtnF8.setEnabled(true);
 		rdbtnAF4.setEnabled(true);
-		rdbtnHR.setEnabled(true);
+
 	}
 	
 	public void setUnenable(){
@@ -276,21 +287,7 @@ public class ChannelButtonsFFT implements ActionListener{
 		rdbtnF4.setEnabled(false);
 		rdbtnF8.setEnabled(false);
 		rdbtnAF4.setEnabled(false);
-		rdbtnHR.setEnabled(false);
 	}
 	
-	
-	public JFreeChart getChart(){
-		return singleLineChartPlot.getChart();
-	}
-	
-	public void setData(List<List<String>> _totalData){
-		totalData = _totalData;
-		//TODO fcalc all features and fft result
-		
-		
-		System.err.println(_totalData.get(0).get(0));
-	}
-		
 
 }

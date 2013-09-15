@@ -50,9 +50,9 @@ public  class BarChart3DPlot implements DatasetChangeListener {
     }
     
     private CategoryDataset createDataset() {
-//    	for(double d:data){
-//    		System.err.println("HERE!!!!!!" +d);
-//    	}
+    	for(double d:data){
+    		System.err.print("HERE!" +d);
+    	}
         dataset = new DefaultCategoryDataset();
         dataset.addValue(data[0], "1", "Delta");
         dataset.addValue(data[1], "2", "Theta");

@@ -1,5 +1,8 @@
 package com.lw.eeg.processing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.lw.eeg.data.EEGData;
 
 public class FeaturesCalc {
@@ -12,13 +15,47 @@ public class FeaturesCalc {
 	private static String windowType = "HANNING";
 	private static double[] fftresult;
 	
+	ArrayList<ArrayList<ArrayList<String>>> fftList = new ArrayList<ArrayList<ArrayList<String>>>();
+	ArrayList<ArrayList<ArrayList<String>>> featureList = new ArrayList<ArrayList<ArrayList<String>>>();
+	//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
+	List<List<String>> fft_1 = new ArrayList<List<String>>();
+	List<List<String>> fft_2 = new ArrayList<List<String>>();
+	List<List<String>> fft_3 = new ArrayList<List<String>>();
+	List<List<String>> fft_4 = new ArrayList<List<String>>();
+	List<List<String>> fft_5 = new ArrayList<List<String>>();
+	List<List<String>> fft_6 = new ArrayList<List<String>>();
+	List<List<String>> fft_7 = new ArrayList<List<String>>();
+	List<List<String>> fft_8 = new ArrayList<List<String>>();
+	List<List<String>> fft_9 = new ArrayList<List<String>>();
+	List<List<String>> fft_10 = new ArrayList<List<String>>();
+	List<List<String>> fft_11 = new ArrayList<List<String>>();
+	List<List<String>> fft_12 = new ArrayList<List<String>>();
+	List<List<String>> fft_13 = new ArrayList<List<String>>();
+	List<List<String>> fft_14 = new ArrayList<List<String>>();
+	
+	
+	List<List<String>> fts_1 = new ArrayList<List<String>>();
+	List<List<String>> fts_2 = new ArrayList<List<String>>();
+	List<List<String>> fts_3 = new ArrayList<List<String>>();
+	List<List<String>> fts_4 = new ArrayList<List<String>>();
+	List<List<String>> fts_5 = new ArrayList<List<String>>();
+	List<List<String>> fts_6 = new ArrayList<List<String>>();
+	List<List<String>> fts_7 = new ArrayList<List<String>>();
+	List<List<String>> fts_8 = new ArrayList<List<String>>();
+	List<List<String>> fts_9 = new ArrayList<List<String>>();
+	List<List<String>> fts_10 = new ArrayList<List<String>>();
+	List<List<String>> fts_11 = new ArrayList<List<String>>();
+	List<List<String>> fts_12 = new ArrayList<List<String>>();
+	List<List<String>> fts_13 = new ArrayList<List<String>>();
+	List<List<String>> fts_14 = new ArrayList<List<String>>();
+	
+	
 	
 	public FeaturesCalc(){
 		eegData = new EEGData();
 		totalFeature = new double[14][4];
 	}
-	
-	
+		
 	public double[][] getTotalFeature(){
 		return totalFeature;
 	}
@@ -39,7 +76,7 @@ public class FeaturesCalc {
 		return fftresult;
 	}
 
-	public static void calc( String[][] adjeegdata){
+	public void calc( String[][] adjeegdata){
 		//AF3,F7,F3,FC5,T7,P7,O1,O2,P8,T8,FC6,F4,F8,AF4,GYROX,GYROY
 		int size = adjeegdata.length/640;
 		avgFeatureAF3 = new double[size][4];
@@ -64,17 +101,134 @@ public class FeaturesCalc {
 				
 					double[] fftbuf= feature.getFFTresult();
 			        feature.calcEEGFeature();
+			        List<String> ffttemp= new ArrayList<String>();
+			        List<String> featuretemp = new ArrayList<String>();
 			        double[] features=feature.getFeature();
 			        
-			        if(ch==1 && index>1000 &&flag){
-			        	//System.out.println("FeaturesCalc.calc() if{}");
-			        	flag=false;
-			        	fftresult = new double[fftbuf.length];
-			        	System.arraycopy(fftbuf, 0, fftresult, 0, fftbuf.length);
-//			        	for(double d: fftresult){
-//			        		System.out.println(d);
-//			        	}
+			        if(ch==1){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_1.add(ffttemp);
+			        	fts_1.add(featuretemp);
 			        }
+			        if(ch==2){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_2.add(ffttemp);
+			        	fts_2.add(featuretemp);
+			        }
+			        if(ch==3){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_3.add(ffttemp);
+			        	fts_3.add(featuretemp);
+			        }
+			        if(ch==4){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_4.add(ffttemp);
+			        	fts_4.add(featuretemp);
+			        }
+			        if(ch==5){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_5.add(ffttemp);
+			        	fts_5.add(featuretemp);
+			        }
+			        if(ch==6){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_6.add(ffttemp);
+			        	fts_6.add(featuretemp);
+			        }
+			        if(ch==7){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_7.add(ffttemp);
+			        	fts_7.add(featuretemp);
+			        }
+			        if(ch==8){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_8.add(ffttemp);
+			        	fts_8.add(featuretemp);
+			        }
+			        if(ch==9){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_9.add(ffttemp);
+			        	fts_9.add(featuretemp);
+			        }
+			        if(ch==10){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_10.add(ffttemp);
+			        	fts_10.add(featuretemp);
+			        }
+			        if(ch==11){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_11.add(ffttemp);
+			        	fts_11.add(featuretemp);
+			        }
+			        if(ch==12){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_12.add(ffttemp);
+			        	fts_12.add(featuretemp);
+			        }
+			        if(ch==13){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_13.add(ffttemp);
+			        	fts_13.add(featuretemp);
+			        }
+			        if(ch==14){
+			        	for(double f:fftbuf)
+			        		ffttemp.add(String.valueOf(f));
+			        	for(double fs:features)
+			        		featuretemp.add(String.valueOf(fs));
+			        	fft_14.add(ffttemp);
+			        	fts_14.add(featuretemp);
+			        }
+			        
+			        
+			        
+//			        if(ch==1 && index>1000 &&flag){
+//			        	//System.out.println("FeaturesCalc.calc() if{}");
+//			        	flag=false;
+//			        	fftresult = new double[fftbuf.length];
+//			        	System.arraycopy(fftbuf, 0, fftresult, 0, fftbuf.length);
+////			        	for(double d: fftresult){
+////			        		System.out.println(d);
+////			        	}
+//			        }
 			        for(int f=0; f<4;f++){
 			        	featuresbuf[f]+=features[f];
 			        } 
@@ -102,6 +256,96 @@ public class FeaturesCalc {
 		
 		
 	}
+	
+	public List<List<String>> getfft_1(){
+		return fft_1;
+	}
+	public List<List<String>> getfft_2(){
+		return fft_2;
+	}
+	public List<List<String>> getfft_3(){
+		return fft_3;
+	}
+	public List<List<String>> getfft_4(){
+		return fft_4;
+	}
+	public List<List<String>> getfft_5(){
+		return fft_5;
+	}
+	public List<List<String>> getfft_6(){
+		return fft_6;
+	}
+	public List<List<String>> getfft_7(){
+		return fft_7;
+	}
+	public List<List<String>> getfft_8(){
+		return fft_8;
+	}
+	public List<List<String>> getfft_9(){
+		return fft_9;
+	}
+	public List<List<String>> getfft_10(){
+		return fft_10;
+	}
+	public List<List<String>> getfft_11(){
+		return fft_11;
+	}
+	public List<List<String>> getfft_12(){
+		return fft_12;
+	}
+	public List<List<String>> getfft_13(){
+		return fft_13;
+	}
+	public List<List<String>> getfft_14(){
+		return fft_14;
+	}
+	
+	
+	
+	public List<List<String>> getfts_1(){
+		return fts_1;
+	}
+	public List<List<String>> getfts_2(){
+		return fts_2;
+	}
+	public List<List<String>> getfts_3(){
+		return fts_3;
+	}
+	public List<List<String>> getfts_4(){
+		return fts_4;
+	}
+	public List<List<String>> getfts_5(){
+		return fts_5;
+	}
+	public List<List<String>> getfts_6(){
+		return fts_6;
+	}
+	public List<List<String>> getfts_7(){
+		return fts_7;
+	}
+	public List<List<String>> getfts_8(){
+		return fts_8;
+	}
+	public List<List<String>> getfts_9(){
+		return fts_9;
+	}
+	public List<List<String>> getfts_10(){
+		return fts_10;
+	}
+	public List<List<String>> getfts_11(){
+		return fts_11;
+	}
+	public List<List<String>> getfts_12(){
+		return fts_12;
+	}
+	public List<List<String>> getfts_13(){
+		return fts_13;
+	}
+	public List<List<String>> getfts_14(){
+		return fts_14;
+	}
+	
+	
 	
 	public double[] calParas(double[][] AllFeature){
 
