@@ -372,76 +372,60 @@ public class MainView extends JFrame {
 							//System.err.println("Before fCals");
 							FeaturesCalc fCalc = new FeaturesCalc();
 							fCalc.calc(adjeegdata);
-							double[] fft =fCalc.getFFTResult();
-//							for(double f:fft){
-//								System.err.println("###  " + f);
-//							}
-							double[][] avgFeatureAF3 = fCalc.getAvgFeatures(); // get all features of every 5 second
-							//double[] featurebuffer = new double[4];
-							//System.err.println(avgFeatureAF3[0][0] +" length :"+ avgFeatureAF3.length);
-							
-							//System.err.println("After fCals, before plot");
-//							BarChart3DPlot featurePlot = new BarChart3DPlot();
-//							ChartPanel featurep = new ChartPanel(featurePlot.getChart());
-//							featurePanel.add(featurep, BorderLayout.CENTER);
-//							featurep.validate();
-//							
-//							for(int f=0; f<avgFeatureAF3.length; f++){
-//								//featurePanel.removeAll();
-//								System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
-//								featurePlot.updateDataset(featurebuffer);
-//							}
-//							
+							List<List<String>> fts_1 = fCalc.getfts_1();
+							List<List<String>> fft_1 = fCalc.getfft_1();
+							Data helper =new Data();
 							//TODO time control update 0.5s
-							long cnttp=System.currentTimeMillis();
-							int i=0;
-							System.err.println(avgFeatureAF3.length);
-							for(int f=0; f<avgFeatureAF3.length; f++){
-								//System.err.println("BARCHART" + f);
-								while(true){
-									if(((System.currentTimeMillis()-cnttp)%500)==0)
-									{	i++;
-										System.out.println(i);
-										featurePanel.removeAll();
-										double[] featurebuffer = new double[4];
-										System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
-										BarChart3DPlot featurePlot = new BarChart3DPlot();
-										featurePlot.setData(featurebuffer);
-										ChartPanel featurep = new ChartPanel(featurePlot.getChart());
-										featurePanel.add(featurep, BorderLayout.CENTER);
-										featurep.revalidate();
-										featurep.repaint();
-										break;
-									}	
-									
-								}
-								
-//											featurePanel.removeAll();
-//											double[] featurebuffer = new double[4];
-//											System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
-//											BarChart3DPlot featurePlot = new BarChart3DPlot();
-//											featurePlot.setData(featurebuffer);
-//											ChartPanel featurep = new ChartPanel(featurePlot.getChart());
-//											featurePanel.add(featurep, BorderLayout.CENTER);
-//											featurep.validate();
-//											featurep.repaint();
-									
-								}
+//							long cnttp=System.currentTimeMillis();
+//							int i=0;
+							//System.err.println(avgFeatureAF3.length);
+//							for(int f=0; f<fts_1.size(); f++){
+//								//System.err.println("BARCHART" + f);
+//								while(true){
+//									if(((System.currentTimeMillis()-cnttp)%500)==0)
+//									{	i++;
+//										System.out.println(i);
+//										featurePanel.removeAll();
+//										double[] featurebuffer = new double[4];
+//										featurebuffer = helper.convertTodouble(fts_1.get(f));
+//										//System.arraycopy(avgFeatureAF3[f], 0, featurebuffer, 0, 4);
+//										BarChart3DPlot featurePlot = new BarChart3DPlot();
+//										featurePlot.setData(featurebuffer);
+//										ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+//										featurePanel.add(featurep, BorderLayout.CENTER);
+//										featurep.revalidate();
+//										featurep.repaint();
+//										break;
+//									}	
+//									
+//								}
+							for(int f=0; f<fts_1.size()-1; f++){
+								System.out.println("BARCHART" + f);
+									featurePanel.removeAll();
+									double[] featurebuffer = new double[4];
+									featurebuffer = helper.convertTodouble(fts_1.get(f));
+									BarChart3DPlot featurePlot = new BarChart3DPlot();
+									featurePlot.setData(featurebuffer);
+									ChartPanel featurep = new ChartPanel(featurePlot.getChart());
+									featurePanel.add(featurep, BorderLayout.CENTER);
+									featurep.revalidate();
+									featurep.repaint();
 
+							}
+							System.err.println("before enter for loog" + fft_1.size());
 							
-							
+							for(int f=0; f<fft_1.size()-1; f++){
+								System.out.println("LineCHART" + f);
+									fftPanel.removeAll();
+									double[] fftbuffer = new double[4];
+									fftbuffer = helper.convertTodouble(fft_1.get(f));							
+									SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
+									singleLineChartPlot.setPanel(fftPanel);
+									singleLineChartPlot.setData(fftbuffer);
+//									featurep.revalidate();
+//									featurep.repaint();
 
-							
-							
-							SingleLineChartPlot singleLineChartPlot = new SingleLineChartPlot();
-							singleLineChartPlot.setPanel(fftPanel);
-							singleLineChartPlot.setData(fft);
-							//singleLineChartPlot.setPanel(fftPanel);
-							//fftPanel.setLayout(new java.awt.BorderLayout());
-//							ChartPanel fftChartPanel = new ChartPanel(singleLineChartPlot.getChart());
-//							fftPanel.add(fftChartPanel,BorderLayout.CENTER);
-//							fftChartPanel.validate();
-							
+							}
 
 	
 						} catch (Exception e1) {

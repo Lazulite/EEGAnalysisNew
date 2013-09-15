@@ -101,10 +101,11 @@ public class FeaturesCalc {
 				
 					double[] fftbuf= feature.getFFTresult();
 			        feature.calcEEGFeature();
-			        List<String> ffttemp= new ArrayList<String>();
-			        List<String> featuretemp = new ArrayList<String>();
 			        double[] features=feature.getFeature();
 			        
+			        List<String> ffttemp= new ArrayList<String>();
+			        List<String> featuretemp = new ArrayList<String>();
+			         
 			        if(ch==1){
 			        	for(double f:fftbuf)
 			        		ffttemp.add(String.valueOf(f));
@@ -258,6 +259,7 @@ public class FeaturesCalc {
 	}
 	
 	public List<List<String>> getfft_1(){
+		System.err.println("bug==>>>>" + fft_1.size());
 		return fft_1;
 	}
 	public List<List<String>> getfft_2(){
