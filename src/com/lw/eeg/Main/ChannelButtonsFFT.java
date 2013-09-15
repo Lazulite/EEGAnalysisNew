@@ -235,7 +235,7 @@ public class ChannelButtonsFFT implements ActionListener{
 			whichchList.add(whichch[i]);
 		}
 		if(chNameList.contains(e.getActionCommand())){
-
+			
 			if(e.getActionCommand()!="AF3"){
 				System.out.println("ChannelButtonsFFT.actionPerformed()");
 				System.err.println("Channel" + e.getActionCommand() + " =>" + chNameList.indexOf(e.getActionCommand()));

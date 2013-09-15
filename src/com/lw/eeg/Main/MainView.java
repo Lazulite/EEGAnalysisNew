@@ -249,10 +249,12 @@ public class MainView extends JFrame {
 		featurePanel = new JPanel();
 		featurePanel.setBackground(new Color(255, 255, 255));
 		featurePanel.setBounds(290, 10, 743, 404);
+		featurePanel.setLayout(new BorderLayout(0,0));
 		tabPanel_1.add(featurePanel);
 		
 		fftPanel = new JPanel();
 		fftPanel.setBounds(290, 418, 743, 245);
+		fftPanel.setLayout(new BorderLayout(0,0));
 		tabPanel_1.add(fftPanel);
 		
 		channelButtonsFFT = new ChannelButtonsFFT(tabPanel_1);

@@ -66,6 +66,7 @@ public class SingleLineChartPlot {
         plot.setRangeGridlinePaint(Color.black);
         plot.getDomainAxis().setAutoRange(true);
         plot.getRangeAxis().setAutoRange(true);
+        plot.getRenderer().setItemLabelsVisible(false);
         
        // System.out.println("SingleLineChartPlot.creatChart()");
         return chart;
