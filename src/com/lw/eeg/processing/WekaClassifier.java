@@ -1,5 +1,9 @@
 package com.lw.eeg.processing;
 
+import java.util.logging.Logger;
+
+import javax.swing.JTextArea;
+
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -15,11 +19,16 @@ import com.lw.eeg.processing.*;
 public class WekaClassifier {
 	private Instances mInstances;
 	private ARFFWraper simpleARFF;
+	private JTextArea logger;
+	private final static String newline = "\n";
 	
 	public WekaClassifier(Instances _instance){
 		mInstances=_instance;
 	}
 	
+	public void setTextLogger(JTextArea log){
+		logger = log;
+	}
 	public Classifier createClassifier(String classifier) throws Exception{
 		
 		Classifier cModel = null;
@@ -48,16 +57,19 @@ public class WekaClassifier {
          
         // Print the result ид la Weka explorer:
         String strSummary = eTest.toSummaryString();
-        System.out.println(strSummary);
+        logger.append(strSummary+newline);
          
         // Get the confusion matrix
         double[][] cmMatrix = eTest.confusionMatrix();
         for(int row_i=0; row_i<cmMatrix.length; row_i++){
             for(int col_i=0; col_i<cmMatrix.length; col_i++){
-                System.out.print(cmMatrix[row_i][col_i]);
-                System.out.print("|");
+            	logger.append(String.valueOf(cmMatrix[row_i][col_i]));
+                logger.append("|");
+//                System.out.print(cmMatrix[row_i][col_i]);
+//                System.out.print("|");
             }
-            System.out.println();
+            logger.append(newline);
+//            System.out.println();
         }
         // output predictions
 //        System.out.println("# - actual - predicted - distribution");

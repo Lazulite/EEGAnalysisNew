@@ -38,7 +38,6 @@ public class ChannelButtonsFFT implements ActionListener{
 	private JPanel fftJPanel;
 	private JPanel ftsJPanel;
 	
-	
 	private JRadioButton rdbtnAF3;
 	private JRadioButton rdbtnF7;
 	private JRadioButton rdbtnF3;

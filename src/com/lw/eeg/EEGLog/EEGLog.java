@@ -73,6 +73,7 @@ public class EEGLog {
 	
 	@SuppressWarnings("deprecation")
 	public void stopRecord(){
+		eeg.stop();
 		eeg=null;
 		//EEG_CONNECT = false;
 		System.err.println("Stop EEG Record");

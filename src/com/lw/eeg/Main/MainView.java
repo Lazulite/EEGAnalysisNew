@@ -27,6 +27,7 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.TabableView;
 
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.block.BorderArrangement;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,14 +86,10 @@ public class MainView extends JFrame {
     
 	public MainView() throws Exception {
 		setPanel();
-
-		//excitePath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\anger\\"+"20130831_235426_rawdata.csv";
-		//relaxPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\final\\sleepy\\"+"20130831_234145_rawdata.csv";
-		//testPath = "C:\\Users\\Leslie\\Desktop\\EEGdata\\newData\\whiteNoise\\"+"20130816_173214_rawdata.csv";
-
 		excitePath = System.getProperty("user.dir") + "\\data\\cs2m\\20130902_225704_rawdata.csv";
-		
-		
+		relaxPath = System.getProperty("user.dir") + "\\data\\whiteNoise\\20130902_225335_rawdata.csv";
+		testPath = System.getProperty("user.dir") + "\\data\\whiteNoise\\20130902_225335_rawdata.csv";
+	
 	}
 	
 	public void setPanel()throws Exception{
@@ -247,7 +244,7 @@ public class MainView extends JFrame {
 		tabPanel_1.setLayout(null);
 
 		featurePanel = new JPanel();
-		featurePanel.setBackground(new Color(255, 255, 255));
+		featurePanel.setBackground(UIManager.getColor("Button.background"));
 		featurePanel.setBounds(290, 10, 743, 404);
 		featurePanel.setLayout(new BorderLayout(0,0));
 		tabPanel_1.add(featurePanel);
@@ -262,7 +259,7 @@ public class MainView extends JFrame {
 		// Tab panel3
 		JPanel tabPanel_2 = new JPanel();
 		tabPanel_2.setBackground(new Color(255, 255, 255));
-		tabbedPane.addTab("Estate", null, tabPanel_2, null);
+		tabbedPane.addTab("E-state", null, tabPanel_2, null);
 		tabPanel_2.setLayout(null);
 		
 		JPanel estatePanel = new JPanel();
@@ -270,18 +267,10 @@ public class MainView extends JFrame {
 		tabPanel_2.add(estatePanel);
 		
 		JCheckBox chckbxKNN = new JCheckBox("KNN");
-		chckbxKNN.setFont(new Font("Tahoma", Font.BOLD, 16));
+		chckbxKNN.setBackground(Color.WHITE);
+		chckbxKNN.setFont(new Font("Nyala", Font.PLAIN, 16));
 		chckbxKNN.setBounds(904, 347, 103, 23);
 		tabPanel_2.add(chckbxKNN);
-		
-		JCheckBox chckbxSVM = new JCheckBox("SVM");
-		chckbxSVM.setFont(new Font("Tahoma", Font.BOLD, 16));
-		chckbxSVM.setBounds(904, 402, 103, 23);
-		tabPanel_2.add(chckbxSVM);
-		
-		JTextArea wekaText = new JTextArea();
-		wekaText.setBounds(167, 347, 609, 305);
-		tabPanel_2.add(wekaText);
 		
 		JPanel tabPanel_3 = new JPanel();
 		tabPanel_3.setBackground(new Color(255, 255, 255));
@@ -292,15 +281,51 @@ public class MainView extends JFrame {
 		estatePanel.setBounds(168, 10, 864, 284);
 		tabPanel_3.add(correlationPanel);
 		
-		final JPanel scatterpanel = new JPanel();
-		scatterpanel.setBackground(Color.WHITE);
-		scatterpanel.setBounds(332, 25, 779, 429);
-		tabPanel_3.add(scatterpanel);
+		
+		JPanel estatelogPanel = new JPanel();
+		estatelogPanel.setBounds(167, 327, 688, 326);
+		tabPanel_2.add(estatelogPanel);
+		estatelogPanel.setLayout(new BorderLayout(0, 0));
+		
+		final JTextArea estateLogger = new JTextArea();
+		estateLogger.setLineWrap(true);
+		DefaultCaret caret2 = (DefaultCaret)estateLogger.getCaret();
+		caret2.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		estateLogger.setFont(new Font("Nyala", Font.PLAIN, 16));
+		estateLogger.setText("Classification log"+newline);
+		
+		JScrollPane scrollPane = new JScrollPane(estateLogger);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		estatelogPanel.add(scrollPane, BorderLayout.CENTER);
+
+		
 		
 
+		JPanel crltextPanel = new JPanel();
+		crltextPanel.setBackground(Color.WHITE);
+		crltextPanel.setBounds(332, 485, 779, 110);
+		tabPanel_3.add(crltextPanel);
+		crltextPanel.setLayout(new BorderLayout(0, 0));
+	
 		final JTextArea correlResult = new JTextArea();
-		correlResult.setBounds(332, 508, 710, 84);
-		tabPanel_3.add(correlResult);
+		estateLogger.setLineWrap(true);
+		DefaultCaret caret3 = (DefaultCaret)correlResult.getCaret();
+		caret3.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		correlResult.setFont(new Font("Nyala", Font.PLAIN, 16));
+		correlResult.setText("Correlation log");
+
+		
+		JScrollPane crlScrollPane = new JScrollPane(correlResult);
+		crltextPanel.add(crlScrollPane, BorderLayout.CENTER);
+		crlScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		
+		
+		
+		final JPanel scatterpanel = new JPanel();
+		scatterpanel.setBackground(UIManager.getColor("Button.background"));
+		scatterpanel.setBounds(332, 25, 779, 429);
+		scatterpanel.setLayout(new BorderLayout(0,0));
+		tabPanel_3.add(scatterpanel);
 
 	
 		ChangeListener changeListener = new ChangeListener() {
@@ -524,6 +549,7 @@ public class MainView extends JFrame {
 		btnStart.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/playback_play.png")));
 		btnStart.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
+				txtlogger.append("[EEG] Recording start" + newline);
 				eegLogger  = new EEGLog(mtoken);
 				eegLogger.startRecord();
 				ChartPanel allChannelp = new ChartPanel(eegLogger.getRealtimeChart());
@@ -536,40 +562,11 @@ public class MainView extends JFrame {
 		btnAnalysis.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/lightbulb.png")));
 		btnAnalysis.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e){
-				
-//				System.out.println("Load Data");
-//				FileDialog dialog = new FileDialog(frame);
-//				dialog.setSize(300, 200);
-//				dialog.setVisible(true);
-//				
-//				if(dialog.getDirectory() != null){
-//					StringTokenizer str = new StringTokenizer(dialog.getFile(), ".");
-//					ArrayList<String> list = new ArrayList<String>();
-//					while(str.hasMoreTokens()){
-//						list.add(str.nextToken());
-//					}
-//					int last = list.size() - 1;
-//					if(list.get(last).equals("csv")){
-//						
-//					}else{
-//						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
-//						dialog_confirm.setLayout(new BorderLayout(0, 0));
-//						dialog_confirm.setBackground(Color.WHITE);
-//						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
-//						dialog_confirm.setSize(400, 100);
-//						dialog_confirm.setLocation(100, 100);
-//						dialog_confirm.setVisible(true);
-//						dialog_confirm.addWindowListener(new WindowAdapter() {
-//							public void windowClosing(WindowEvent e){
-//								dialog_confirm.dispose();
-//							}
-//						});
-//					}
-//				}
 //				
 				// analysis loading data from eeg and heart data csv 
 				try{
-					
+				txtlogger.append("Classifier trained"+ newline);	
+				estateLogger.append("Classifier trained"+newline);
 				List<List<Double>> trainSet = new ArrayList<List<Double>>();
 				List<Double> temp = new ArrayList<Double>();
 				List<List<Double>> testSet = new ArrayList<List<Double>>();
@@ -589,12 +586,9 @@ public class MainView extends JFrame {
 				}
 				
 				trainSet.add(temp);
-				
-//				System.err.println("tranSet.size" + trainSet.size() + "  " + trainSet.get(0).size());
-				
-				
+			
 				// Sleepy
-				EEGData sleepyData = new EEGData(sleepyPath);
+				EEGData sleepyData = new EEGData(relaxPath);
 				String[][] sleepyeeg = sleepyData.init();
 				sleepyeeg=sleepyData.readData(sleepyData.init());
 				String[][] sleepyAdj=sleepyData.adjustData(sleepyeeg, 128*3,0);
@@ -604,10 +598,8 @@ public class MainView extends JFrame {
 				double[] sleepyFeatures= fCalc.calParas(fCalc.getTotalFeature()); 
 				
 				List<Double> tempx = new ArrayList<Double>();
-				//System.err.println("!!!!!!!!!!!" + temp.size());
 				for(double d: sleepyFeatures){
 					tempx.add(Double.valueOf(d));
-					//System.err.println(d);
 				}
 				
 				trainSet.add(tempx);
@@ -627,62 +619,86 @@ public class MainView extends JFrame {
 				mInstances.setClassIndex(mInstances.numAttributes()-1);
 				
 				WekaClassifier mWeka = new WekaClassifier(mInstances);
-				Classifier classifier;
-		
-				classifier = mWeka.createClassifier("NaiveBayes");
-					
-				// test
-				// read test data
-				windowSize = 5;
-				int blockSize=sampleRate*windowSize;
-				EEGData testData = new EEGData(testPath);
-				String[][] testeeg = testData.init();
-				testeeg=testData.readData(testData.init());
-				String[][] testAdj=testData.adjustData(testeeg, 128*3,0);
+                mWeka.setTextLogger(estateLogger);
 				
-				int numWindow =(int) testAdj.length/(blockSize);
-				String[][] winData = new String[blockSize][testAdj[0].length];
-				
-				for(int n=0; n<numWindow; n++){
+				Classifier classifier = mWeka.createClassifier("NaiveBayes");
 					
-					//System.err.println(n+" =============================");
-					winData = testData.getSegment(testAdj, n*blockSize, blockSize);
-					fCalc.calc(winData);
-					double[] winFeatures = fCalc.calParas(fCalc.getTotalFeature());
-					List<Double> testTemp = new ArrayList<Double>();
-					for(double d: winFeatures){
-						testTemp.add(Double.valueOf(d));
+				FileDialog dialog = new FileDialog(frame);
+				dialog.setSize(300, 200);
+				dialog.setVisible(true);
+				
+				if(dialog.getDirectory() != null){
+					StringTokenizer str = new StringTokenizer(dialog.getFile(), ".");
+					ArrayList<String> list = new ArrayList<String>();
+					while(str.hasMoreTokens()){
+						list.add(str.nextToken());
 					}
-					testSet.add(testTemp);
+					int last = list.size() - 1;
+					if(list.get(last).equals("csv")){
+						txtlogger.append("Test data loaded"+newline);
+						estateLogger.append("Test data loaded"+newline);
+						String path = dialog.getDirectory() + dialog.getFile();
+						windowSize = 5;
+						int blockSize=sampleRate*windowSize;
+						EEGData testData = new EEGData(path);
+						String[][] testeeg = testData.init();
+						testeeg=testData.readData(testData.init());
+						String[][] testAdj=testData.adjustData(testeeg, 128*3,0);
+						
+						int numWindow = (int) testAdj.length/(blockSize);
+						String[][] winData = new String[blockSize][testAdj[0].length];
+						
+						for(int n=0; n<numWindow; n++){
+							
+							//System.err.println(n+" =============================");
+							winData = testData.getSegment(testAdj, n*blockSize, blockSize);
+							fCalc.calc(winData);
+							double[] winFeatures = fCalc.calParas(fCalc.getTotalFeature());
+							List<Double> testTemp = new ArrayList<Double>();
+							for(double d: winFeatures){
+								testTemp.add(Double.valueOf(d));
+							}
+							testSet.add(testTemp);
+						}
+						
+						txtlogger.append("Classifying..." + newline);
+						estateLogger.append("Classifying..."+newline);
+						ARFFWraper simpleARFFtest = new ARFFWraper(testSet);
+						simpleARFFtest.create();
+						Instances mtest = simpleARFFtest.getInstances(); 
+						mtest.setClassIndex(mtest.numAttributes()-1);
+						
+						mWeka.Evaluation(classifier,mtest);
+						
+						for (int i = 0; i < mtest.numInstances(); i++) {
+							double clsLabel = classifier.classifyInstance(mtest.instance(i));
+							double[] dist = classifier.distributionForInstance(mtest.instance(i)); 
+							estateLogger.append((i+1) + " - ");
+							estateLogger.append(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
+							estateLogger.append(mtest.classAttribute().value((int) clsLabel) + " => ");
+							estateLogger.append((Utils.arrayToString(dist))+newline);
+//							System.out.print(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
+//							System.out.print(mtest.classAttribute().value((int) clsLabel) + " => ");
+//							System.out.println(Utils.arrayToString(dist));
+						}
+						
+						
+						
+					}else{
+						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");
+						dialog_confirm.setLayout(new BorderLayout(0, 0));
+						dialog_confirm.setBackground(Color.WHITE);
+						dialog_confirm.add(new Label("Check your File, Please Select \".csv\" File!!", Label.CENTER));
+						dialog_confirm.setSize(400, 100);
+						dialog_confirm.setLocation(100, 100);
+						dialog_confirm.setVisible(true);
+						dialog_confirm.addWindowListener(new WindowAdapter() {
+							public void windowClosing(WindowEvent e){
+								dialog_confirm.dispose();
+							}
+						});
+					}
 				}
-					
-					ARFFWraper simpleARFFtest = new ARFFWraper(testSet);
-					simpleARFFtest.create();
-					Instances mtest = simpleARFFtest.getInstances(); 
-					mtest.setClassIndex(mtest.numAttributes()-1);
-					
-					mWeka.Evaluation(classifier,mtest);
-					
-
-			//		double[] dist =classifier.distributionForInstance(test.instance(i)); 
-					for (int i = 0; i < mtest.numInstances(); i++) {
-						double clsLabel = classifier.classifyInstance(mtest.instance(i));
-						double[] dist = classifier.distributionForInstance(mtest.instance(i)); 
-						System.out.print((i+1) + " - ");
-						System.out.print(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
-						System.out.print(mtest.classAttribute().value((int) clsLabel) + " => ");
-						System.out.println(Utils.arrayToString(dist));
-						//mtest.instance(i).setClassValue(clsLabel);
-					}
-					
-					
-//					double clsLabel = classifier.classifyInstance(mtest.firstInstance());
-//					double[] dist = classifier.distributionForInstance(mtest.firstInstance()); 
-//					System.err.println("Classification result");
-//					System.out.print(mtest.firstInstance().toString(mtest.classIndex()));
-////					System.out.print(mtest.classAttribute().value((int) clsLabel) + " - ");
-//					System.out.println(Utils.arrayToString(dist));
-
 				
 					
 					
@@ -690,24 +706,6 @@ public class MainView extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
-				// calc paras
-				// put into ARFF wrapper
-/*				System.err.println("before construction ");
-				ARFFWraper simpleARFFtest = new ARFFWraper(paratest);
-				System.err.println("after construction before weired things occurs");
-				simpleARFFtest.createTest();
-				System.err.println("weired things occur before this line, I made two copies of weired output");
-				Instances mtest = simpleARFF.getTestInstances(); 
-				mtest.setClassIndex(mtest.numAttributes()-1);*/
-				
-				
-				// evaluation
-/*				mWeka.Evaluation(classifier,mtest);
-				
-				double clsLabel = classifier.classifyInstance(mtest.firstInstance());
-				System.err.println("Classification result");
-				System.out.print(mtest.firstInstance().toString(mtest.classIndex()));*/
 	
 			}
 			
@@ -718,7 +716,7 @@ public class MainView extends JFrame {
 		btnVideo.setIcon(new ImageIcon(MainView.class.getResource("/com/lw/gui/resource/video_information_32.png")));
 		btnVideo.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
-
+				txtlogger.append("[video] play" + newline);
 				VLCPlayer vlcPlayer = new VLCPlayer();
 				vlcPlayer.play();
 
@@ -731,6 +729,7 @@ public class MainView extends JFrame {
 			public void mouseClicked(MouseEvent e){
 				eegLogger.stopRecord();
 				stopflag=true;
+				txtlogger.append("[EEG] Recording stop" + newline);
 			}
 		});
 		
@@ -817,14 +816,11 @@ public class MainView extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE)
 		);
+
 		
 		
 		
-		
-		
-		
-		
-		JButton btnEEG = new JButton("EEG");
+		JButton btnEEG = new JButton("E-state");
 		btnEEG.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e){
 				System.out.println("Load Data");
@@ -895,6 +891,8 @@ public class MainView extends JFrame {
 					}
 					int last = list.size() - 1;
 					if(list.get(last).equals("csv")){
+						
+						txtlogger.append("Estate vs HR" + newline);
 						String path = dialog2.getDirectory() + dialog2.getFile();
 						HRVData hrvData = new HRVData(path);
 						String[][] hrvRawData;
@@ -927,6 +925,8 @@ public class MainView extends JFrame {
 				}
 			}
 		});
+		
+		
 
 		
 		JButton btnHRV = new JButton("HRV");
@@ -946,6 +946,7 @@ public class MainView extends JFrame {
 					}
 					int last = list.size() - 1;
 					if(list.get(last).equals("csv")){
+						txtlogger.append("Estate vs HRV" + newline);
 						String path = dialog2.getDirectory() + dialog2.getFile();
 						HRVData hrvData = new HRVData(path);
 						String[][] hrvRawData;
