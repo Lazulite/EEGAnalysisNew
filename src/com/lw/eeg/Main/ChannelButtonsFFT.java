@@ -240,7 +240,7 @@ public class ChannelButtonsFFT implements ActionListener{
 				System.err.println("Channel" + e.getActionCommand() + " =>" + chNameList.indexOf(e.getActionCommand()));
 				
 				rdbtnAF3.setSelected(false);
-				whichchList.add(chNameList.indexOf(e.getActionCommand()), "true");
+				whichchList.set(chNameList.indexOf(e.getActionCommand()), "true");
 				Data helper =new Data();
 				List<List<String>> ftsTemp= new ArrayList<List<String>>();
 				List<List<String>> fftTemp= new ArrayList<List<String>>();
@@ -273,7 +273,7 @@ public class ChannelButtonsFFT implements ActionListener{
 				}
 
 			}else{
-				whichchList.add(chNameList.indexOf(e.getActionCommand()), "true");
+				whichchList.set(chNameList.indexOf(e.getActionCommand()), "true");
 			}
 			
 		}else {

@@ -8,6 +8,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.*;
+import weka.classifiers.lazy.IBk;
 import weka.classifiers.pmml.consumer.SupportVectorMachineModel;
 import weka.classifiers.trees.*;
 import weka.core.Instances;
@@ -29,7 +30,7 @@ public class WekaClassifier {
 	public void setTextLogger(JTextArea log){
 		logger = log;
 	}
-	public Classifier createClassifier(String classifier) throws Exception{
+	public Classifier createClassifier(String classifier, int para) throws Exception{
 		
 		Classifier cModel = null;
 		if(classifier=="NaiveBayes"){
@@ -37,10 +38,13 @@ public class WekaClassifier {
 	        cModel=(Classifier) new NaiveBayes();
 	        cModel.buildClassifier(mInstances);
 		}
-		
-		if(classifier=="TreeJ48"){
-			cModel=(Classifier) new J48();
-	        cModel.buildClassifier(mInstances);
+		if(classifier == "KNN"){
+			if(para==-1)
+				cModel = (Classifier) new IBk();
+			else {
+				cModel = (Classifier) new IBk(para);
+			}
+			cModel.buildClassifier(mInstances);
 		}
 		if(classifier == "SVM "){
 			cModel = (Classifier) new SMO();
@@ -65,11 +69,8 @@ public class WekaClassifier {
             for(int col_i=0; col_i<cmMatrix.length; col_i++){
             	logger.append(String.valueOf(cmMatrix[row_i][col_i]));
                 logger.append("|");
-//                System.out.print(cmMatrix[row_i][col_i]);
-//                System.out.print("|");
             }
             logger.append(newline);
-//            System.out.println();
         }
         // output predictions
 //        System.out.println("# - actual - predicted - distribution");

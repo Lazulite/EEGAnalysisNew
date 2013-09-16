@@ -37,6 +37,7 @@ import org.omg.CORBA.SystemException;
 import weka.classifiers.Classifier;
 import weka.core.Instances;
 import weka.core.Utils;
+import weka.core.neighboursearch.LinearNNSearch;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -58,6 +59,7 @@ public class MainView extends JFrame {
 	private JPanel singleChannelPanel; // Singchannel panel
 	private JPanel featurePanel; // Feature Panel
 	private JPanel fftPanel; // FFT panel
+	private JPanel estatePanel;
 	private ChannelButtonsFFT channelButtonsFFT;
 	private ChannelButtons channelButtons;
 	
@@ -83,13 +85,15 @@ public class MainView extends JFrame {
     private List<String> unitLabels = new ArrayList<String>();
 	private Boolean stopflag=false;
     
+	private List<Double> knnDistanseList = new ArrayList<Double>();
+	private List<String> knnNeighbourList = new ArrayList<String>();
+	private boolean knn=false;
     
 	public MainView() throws Exception {
 		setPanel();
 		excitePath = System.getProperty("user.dir") + "\\data\\cs2m\\20130902_225704_rawdata.csv";
 		relaxPath = System.getProperty("user.dir") + "\\data\\whiteNoise\\20130902_225335_rawdata.csv";
-		testPath = System.getProperty("user.dir") + "\\data\\whiteNoise\\20130902_225335_rawdata.csv";
-	
+		testPath = System.getProperty("user.dir") + "\\data\\whiteNoise\\20130902_225335_rawdata.csv";	
 	}
 	
 	public void setPanel()throws Exception{
@@ -174,16 +178,6 @@ public class MainView extends JFrame {
 		});
 		mnFile.add(mntmExit);
 		
-		JMenu mnAnalysis = new JMenu("Analysis");
-		menuBar.add(mnAnalysis);
-		
-		JMenuItem mntmStart = new JMenuItem("Start");
-		mntmStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		mnAnalysis.add(mntmStart);
-		
 		JMenu mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
 		
@@ -262,14 +256,21 @@ public class MainView extends JFrame {
 		tabbedPane.addTab("E-state", null, tabPanel_2, null);
 		tabPanel_2.setLayout(null);
 		
-		JPanel estatePanel = new JPanel();
+		estatePanel = new JPanel();	
 		estatePanel.setBounds(168, 10, 864, 284);
+		estatePanel.setLayout(new BorderLayout(0, 0));
 		tabPanel_2.add(estatePanel);
+		
 		
 		JCheckBox chckbxKNN = new JCheckBox("KNN");
 		chckbxKNN.setBackground(Color.WHITE);
 		chckbxKNN.setFont(new Font("Nyala", Font.PLAIN, 16));
 		chckbxKNN.setBounds(904, 347, 103, 23);
+		chckbxKNN.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e){
+				knn=true;
+			}
+		});
 		tabPanel_2.add(chckbxKNN);
 		
 		JPanel tabPanel_3 = new JPanel();
@@ -278,7 +279,6 @@ public class MainView extends JFrame {
 		tabPanel_3.setLayout(null);
 		
 		JPanel correlationPanel = new JPanel();
-		estatePanel.setBounds(168, 10, 864, 284);
 		tabPanel_3.add(correlationPanel);
 		
 		
@@ -620,8 +620,15 @@ public class MainView extends JFrame {
 				
 				WekaClassifier mWeka = new WekaClassifier(mInstances);
                 mWeka.setTextLogger(estateLogger);
-				
-				Classifier classifier = mWeka.createClassifier("NaiveBayes");
+                Classifier classifier;
+                final weka.core.neighboursearch.LinearNNSearch knnTest = new LinearNNSearch(mInstances);
+                if(knn){
+					classifier = mWeka.createClassifier("KNN",-1);
+					estateLogger.append("Classifier: KNN"+newline);
+				}else {
+					classifier = mWeka.createClassifier("NaiveBayes",-1);
+					estateLogger.append("Classifier: NaiveBayes"+newline);
+				}
 					
 				FileDialog dialog = new FileDialog(frame);
 				dialog.setSize(300, 200);
@@ -635,6 +642,7 @@ public class MainView extends JFrame {
 					}
 					int last = list.size() - 1;
 					if(list.get(last).equals("csv")){
+						
 						txtlogger.append("Test data loaded"+newline);
 						estateLogger.append("Test data loaded"+newline);
 						String path = dialog.getDirectory() + dialog.getFile();
@@ -668,21 +676,59 @@ public class MainView extends JFrame {
 						Instances mtest = simpleARFFtest.getInstances(); 
 						mtest.setClassIndex(mtest.numAttributes()-1);
 						
-						mWeka.Evaluation(classifier,mtest);
-						
-						for (int i = 0; i < mtest.numInstances(); i++) {
-							double clsLabel = classifier.classifyInstance(mtest.instance(i));
-							double[] dist = classifier.distributionForInstance(mtest.instance(i)); 
-							estateLogger.append((i+1) + " - ");
-							estateLogger.append(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
-							estateLogger.append(mtest.classAttribute().value((int) clsLabel) + " => ");
-							estateLogger.append((Utils.arrayToString(dist))+newline);
-//							System.out.print(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
-//							System.out.print(mtest.classAttribute().value((int) clsLabel) + " => ");
-//							System.out.println(Utils.arrayToString(dist));
+						if(!knn){
+							mWeka.Evaluation(classifier,mtest);
+							
+							for (int i = 0; i < mtest.numInstances(); i++) {
+								double clsLabel = classifier.classifyInstance(mtest.instance(i));
+								double[] dist = classifier.distributionForInstance(mtest.instance(i)); 
+								estateLogger.append((i+1) + " - ");
+								estateLogger.append(mtest.instance(i).toString(mtest.classIndex()) + " *-* ");
+								estateLogger.append(mtest.classAttribute().value((int) clsLabel) + " => ");
+								estateLogger.append((Utils.arrayToString(dist))+newline);
+							}
+						}else{
+							for (int i = 0; i < mtest.numInstances(); i++) {
+								Instances nearestInstances= knnTest.kNearestNeighbours(mtest.instance(i), 1);
+								double[] distance = knnTest.getDistances();
+								for(int j=0; j<nearestInstances.numInstances(); j++){
+									knnNeighbourList.add(nearestInstances.instance(j).toString(mtest.classIndex()));
+									knnDistanseList.add(Double.valueOf(distance[j]));
+									estateLogger.append(i +" "+nearestInstances.instance(j).toString(mtest.classIndex())
+											+" - " +distance[j]+newline);
+								}
+							}
+							
+							double[] knntemp = new double[knnDistanseList.size()];
+							for(int i=0; i<knnDistanseList.size(); i++){
+								knntemp[i]=(double)knnDistanseList.get(i);
+							}
+							estateLogger.append("After score calculation..."+newline);
+							
+							Correlation clr = new Correlation();
+							knntemp = clr.Normalize(knntemp, 1, -1);
+							
+							for(int d=0; d<knntemp.length; d++){
+								if(knnNeighbourList.get(d).equals("B"))
+									knntemp[d]=knntemp[d]*-1;
+							}
+							
+							for(int d=0;d<knntemp.length; d++){
+								if(knntemp[d]==1.0 || knntemp[d] ==-1){
+									knntemp[d]=0;}
+								else{
+									knntemp[d]=-1*knntemp[d];
+								}
+								estateLogger.append(d+" " + knnNeighbourList.get(d)+" - "+ String.valueOf(knntemp[d])+newline);
+							}
+							
+							SingleLineChartPlot scp = new SingleLineChartPlot();
+							scp.setPanel(estatePanel);
+							scp.setData(knntemp);
 						}
 						
 						
+	
 						
 					}else{
 						final Dialog dialog_confirm = new Dialog(frame, "Whoop!");

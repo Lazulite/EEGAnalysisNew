@@ -37,9 +37,7 @@ public class SingleLineChartPlot {
 //			System.out.println(d);
 		XYSeriesCollection seriesCollection = createSeries();
 		JFreeChart mChart = creatChart(seriesCollection);	
-		fftJPanel.getSize();
 		ChartPanel fftp = new ChartPanel(mChart);
-		fftp.setSize(fftJPanel.getSize());
 		fftJPanel.add(fftp, BorderLayout.CENTER);
 		fftp.validate();
 	}
@@ -67,7 +65,7 @@ public class SingleLineChartPlot {
         plot.getDomainAxis().setAutoRange(true);
         plot.getRangeAxis().setAutoRange(true);
         plot.getRenderer().setItemLabelsVisible(false);
-        
+        plot.getRenderer().setSeriesItemLabelsVisible(0, false);
        // System.out.println("SingleLineChartPlot.creatChart()");
         return chart;
 
